@@ -1,0 +1,1473 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body><title>LA Gang Bewerbung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Onest:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap">
+<style>
+/* Layout: one 46rem column on black. Red and blue are the crew's two colors: blue marks
+   Mitglied and the default selection state, red marks Divisions Anführer and every main action.
+   Green is the third accent: labels and step progress, the open status, requirements, and
+   everything that confirms (finished steps, met minimums, copied text, the rules checkbox).
+   Single dark theme on purpose, because black is part of the brief.
+   The application phase (open/closed) is baked into the page as data-phase; the owner's switch
+   republishes the page from the template kept in #page-src, so every visitor gets the new state. */
+:root {
+  color-scheme: dark;
+  --bg: #08080B;
+  --surface: #111117;
+  --field: #0C0C10;
+  --sunken: #1B1B23;
+  --ink: #F3F3F7;
+  --muted: #A0A0AD;
+  --line: #24242E;
+  --line-strong: #3B3B48;
+  --red: #D91A28;
+  --red-ink: #FF4D57;
+  --blue: #2458E0;
+  --blue-ink: #6B95FF;
+  --green: #3DDC84;
+  --white: #FFFFFF;
+  --font-display: "Unbounded", "Arial Black", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  padding-inline: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, p { margin: 0; }
+::selection { background: var(--green); color: var(--bg); }
+button, input, textarea { font: inherit; color: inherit; }
+
+[data-t="member"] { --c: var(--blue); --c-ink: var(--blue-ink); }
+[data-t="leader"] { --c: var(--red); --c-ink: var(--red-ink); }
+
+.page {
+  --accent: var(--blue);
+  --accent-ink: var(--blue-ink);
+  --accent-soft: color-mix(in srgb, var(--accent) 24%, transparent);
+  max-width: 46rem;
+  margin-inline: auto;
+  padding-block: 24px 64px;
+  display: grid;
+  gap: 56px;
+}
+.page[data-type="leader"] { --accent: var(--red); --accent-ink: var(--red-ink); }
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+.eyebrow.done::before {
+  content: "✓";
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  color: var(--bg);
+  font-size: 10px;
+  font-weight: 700;
+  vertical-align: 1px;
+}
+
+/* Server header */
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+}
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.emblem {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--red) 0 50%, var(--blue) 50% 100%);
+  color: var(--white);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+}
+.brand-name { font-family: var(--font-display); font-weight: 600; font-size: 17px; line-height: 1.2; }
+.brand-sub { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid color-mix(in srgb, var(--green) 45%, transparent);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--green);
+  background: color-mix(in srgb, var(--green) 10%, var(--surface));
+}
+.status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 22%, transparent);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+
+/* Hero */
+.hero { display: grid; gap: 20px; }
+.kicker { display: flex; align-items: center; gap: 12px; }
+.mark {
+  width: 60px;
+  height: 6px;
+  flex: none;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--red) 0 40%, var(--blue) 40% 80%, var(--green) 80% 100%);
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 1.1rem + 4.6vw, 3.4rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.mention {
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  border-radius: .16em;
+  padding: 0 .14em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  overflow-wrap: anywhere;
+  transition: color .3s ease, background-color .3s ease;
+}
+.lede { font-size: 1.125rem; color: var(--muted); max-width: 34rem; }
+.lede strong { color: var(--ink); font-weight: 600; }
+.wanted { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.wanted .eyebrow { margin-right: 4px; }
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color .2s ease, background-color .2s ease;
+}
+.pill:hover { border-color: var(--c-ink); }
+.pill[aria-pressed="true"] {
+  border-color: var(--c-ink);
+  background: color-mix(in srgb, var(--c) 22%, var(--surface));
+}
+.pill:focus-visible { outline: 2px solid var(--c-ink); outline-offset: 2px; }
+.dot { width: 10px; height: 10px; flex: none; border-radius: 50%; background: var(--c-ink); }
+
+/* Form steps */
+form { display: grid; gap: 56px; }
+.step-head { display: grid; gap: 6px; margin-bottom: 20px; }
+.step-head h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.375rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.step-head p:not(.eyebrow) { color: var(--muted); max-width: 36rem; }
+
+/* Choice cards */
+.roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 12px;
+}
+.role {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease;
+}
+.role:hover { border-color: var(--line-strong); }
+.role input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+.role-top { display: flex; align-items: center; gap: 10px; }
+.role-name { font-weight: 700; font-size: 1.125rem; color: var(--c-ink); }
+.role-check {
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  display: grid;
+  place-items: center;
+}
+.role-desc { color: var(--muted); font-size: .95rem; }
+.reqs { display: flex; flex-wrap: wrap; gap: 6px; }
+.reqs span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  line-height: 1.3;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: var(--sunken);
+}
+.reqs span::before {
+  content: "✓";
+  flex: none;
+  color: var(--green);
+  font-weight: 700;
+}
+.role:has(input:checked) {
+  border-color: var(--c-ink);
+  box-shadow: inset 0 0 0 1px var(--c-ink);
+  background: color-mix(in srgb, var(--c) 14%, var(--surface));
+}
+.role:has(input:checked) .role-check { border-color: var(--c-ink); background: var(--c); }
+.role:has(input:checked) .role-check::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--white);
+}
+.role:has(input:focus-visible) { outline: 2px solid var(--c-ink); outline-offset: 3px; }
+.roles:has(input[aria-invalid="true"]) .role { border-color: var(--red-ink); }
+
+/* Fields */
+.fields { display: grid; gap: 26px; }
+.row-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 26px;
+}
+.field { display: grid; gap: 6px; min-width: 0; }
+fieldset.field { border: 0; margin: 0; padding: 0; min-width: 0; display: block; }
+fieldset.field > legend { padding: 0; margin-bottom: 10px; }
+.field > label, fieldset.field > legend, .q-label { font-weight: 600; font-size: 1rem; line-height: 1.4; }
+.opt { font-weight: 400; font-size: .875rem; color: var(--muted); white-space: nowrap; }
+.hint { font-size: .875rem; color: var(--muted); }
+input[type="text"], textarea {
+  width: 100%;
+  font-size: 16px;
+  background: var(--field);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 12px 14px;
+  transition: border-color .2s ease;
+}
+input::placeholder, textarea::placeholder { color: var(--muted); opacity: .7; }
+textarea { min-height: 8.5rem; resize: vertical; line-height: 1.5; }
+textarea:disabled { background: var(--sunken); border-style: dashed; cursor: not-allowed; }
+input[type="text"]:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 1px;
+  border-color: var(--accent-ink);
+}
+input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--red-ink); }
+.at { position: relative; }
+.at::before {
+  content: "@";
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  color: var(--muted);
+  pointer-events: none;
+}
+.at input { padding-left: 34px; font-family: var(--font-mono); }
+.err { display: flex; align-items: baseline; gap: 7px; color: var(--red-ink); font-size: .875rem; font-weight: 500; }
+.err::before {
+  content: "!";
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--red-ink);
+  color: var(--bg);
+  font-size: 11px;
+  font-weight: 700;
+  transform: translateY(2px);
+}
+.err:empty { display: none; }
+.field-foot { display: flex; align-items: flex-start; gap: 12px; }
+.count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.count.ok { color: var(--green); }
+.count.ok::before { content: "✓ "; }
+.q-tag {
+  justify-self: start;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+
+/* Choice chips */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { position: relative; }
+.chip input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+.chip > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--field);
+  font-size: .95rem;
+  line-height: 1.3;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease;
+}
+.chip > span:hover { border-color: var(--accent-ink); }
+.chip input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--white); }
+.chip input:focus-visible + span { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+.chip input[aria-invalid="true"] + span { border-color: var(--red-ink); }
+fieldset.field > .err { margin-top: 8px; }
+
+/* Finish */
+.finish { display: grid; gap: 16px; }
+.confirm { display: flex; align-items: flex-start; gap: 12px; font-weight: 500; cursor: pointer; }
+.confirm input { width: 22px; height: 22px; margin: 1px 0 0; flex: none; accent-color: var(--green); }
+.confirm input[aria-invalid="true"] { outline: 2px solid var(--red-ink); outline-offset: 2px; }
+.submit-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.draft-note { font-size: .875rem; color: var(--muted); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 22px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .1s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
+.btn-primary { background: var(--red); color: var(--white); }
+.btn-primary:hover { background: color-mix(in srgb, var(--red) 86%, var(--white)); }
+.btn-primary:focus-visible { outline-color: var(--red-ink); }
+.btn-ghost { background: var(--surface); border-color: var(--line-strong); color: var(--ink); }
+.btn-ghost:hover { border-color: var(--accent-ink); }
+.btn-small { padding: 10px 14px; font-size: .9375rem; border-radius: 10px; }
+.btn-quiet { background: none; color: var(--muted); padding-inline: 10px; text-decoration: underline; text-underline-offset: 3px; }
+.btn-quiet.armed { color: var(--red-ink); }
+.btn.copied, .btn.copied:hover { background: var(--green); border-color: var(--green); color: var(--bg); }
+.submit-row .btn { width: 100%; }
+
+/* Result */
+.result {
+  display: grid;
+  gap: 24px;
+  padding: 22px 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 28px 60px -34px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+.result:focus { outline: none; }
+.result .step-head { margin-bottom: 0; }
+.member {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  min-width: 0;
+}
+.avatar {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--white);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+}
+.member-text { display: grid; min-width: 0; }
+.member-name { font-weight: 700; color: var(--accent-ink); overflow-wrap: anywhere; }
+.member-role { font-size: 13px; color: var(--muted); }
+.handoff { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; counter-reset: s; }
+.handoff > li {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 12px;
+  counter-increment: s;
+}
+.handoff > li::before {
+  content: counter(s);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent-ink);
+  color: var(--accent-ink);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 14px;
+}
+.handoff > li.done::before { content: "✓"; background: var(--green); border-color: var(--green); color: var(--bg); }
+.handoff-body, .variant { display: grid; gap: 10px; min-width: 0; justify-items: start; }
+.handoff-body > *, .variant > * { max-width: 100%; }
+.handoff h3 { font-size: 1.0625rem; font-weight: 700; padding-top: 4px; }
+.handoff p { color: var(--muted); }
+.handoff p strong { color: var(--ink); font-weight: 600; }
+#msgs { display: grid; gap: 18px; width: 100%; }
+.msg { display: grid; gap: 8px; min-width: 0; }
+.msg-part { font-family: var(--font-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.msg-text {
+  margin: 0;
+  max-height: 20rem;
+  overflow: auto;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--field);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.msg-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.msg-foot .count { margin-left: 0; }
+.msg-foot .btn { width: 100%; }
+.contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--field);
+}
+.contact .avatar { background: var(--ink); color: var(--bg); }
+.contact .member-text { flex: 1 1 8rem; }
+.contact-name { font-weight: 700; }
+.contact-user { font-family: var(--font-mono); font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
+.contact-user::before { content: "@"; }
+.copy-status { font-size: .875rem; color: var(--muted); }
+.copy-status.ok { color: var(--green); }
+.copy-status:empty { display: none; }
+.split-note { font-size: .875rem; color: var(--muted); }
+.stale { font-size: .9rem; font-weight: 500; color: var(--red-ink); }
+.result-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+/* Footer */
+.foot { display: grid; gap: 8px; padding-top: 20px; border-top: 1px solid var(--line); font-size: .875rem; color: var(--muted); }
+.noscript { padding: 14px; border-radius: 10px; background: var(--sunken); }
+
+/* Phase: open or closed */
+.page[data-phase="closed"] .when-open { display: none !important; }
+.page:not([data-phase="closed"]) .when-closed { display: none !important; }
+.status-closed {
+  color: var(--red-ink);
+  border-color: color-mix(in srgb, var(--red-ink) 45%, transparent);
+  background: color-mix(in srgb, var(--red) 12%, var(--surface));
+}
+.status-closed::before {
+  background: var(--red-ink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red-ink) 22%, transparent);
+  animation: none;
+}
+.closed-since { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.closed-since:empty { display: none; }
+.closed {
+  display: grid;
+  gap: 12px;
+  padding: 22px 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+}
+.closed h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; line-height: 1.3; }
+
+/* Owner panel with the phase switch */
+.admin {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  padding: 16px 18px;
+  border: 1px dashed color-mix(in srgb, var(--green) 55%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--green) 6%, var(--surface));
+}
+.admin-text { display: grid; gap: 4px; min-width: 0; flex: 1 1 14rem; }
+.admin-title { font-weight: 700; font-size: 1.0625rem; }
+.admin-hint { font-size: .875rem; color: var(--muted); }
+.admin-status { flex-basis: 100%; font-size: .875rem; color: var(--muted); }
+.admin-status:empty { display: none; }
+.admin-status.error { color: var(--red-ink); }
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  cursor: pointer;
+}
+.switch:disabled { cursor: progress; opacity: .7; }
+.switch:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+.switch-track {
+  position: relative;
+  width: 52px;
+  height: 30px;
+  flex: none;
+  border-radius: 999px;
+  background: var(--red);
+  transition: background-color .2s ease;
+}
+.switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--white);
+  transition: transform .2s ease;
+}
+.switch[aria-checked="true"] .switch-track { background: var(--green); }
+.switch[aria-checked="true"] .switch-thumb { transform: translateX(22px); }
+.switch-label { min-width: 6.5em; text-align: left; font-weight: 600; }
+
+@media (min-width: 40rem) {
+  .page { padding-block: 40px 96px; gap: 72px; }
+  form { gap: 64px; }
+  .step-head h2 { font-size: 1.625rem; }
+  .submit-row .btn { width: auto; }
+  .msg-foot .btn { width: auto; margin-left: auto; }
+  .result { padding: 30px 28px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0s !important; animation: none !important; }
+}
+</style>
+
+<div class="page" id="page" data-phase="open">
+  <section class="admin" id="admin" aria-labelledby="admin-title" hidden>
+    <div class="admin-text">
+      <p class="eyebrow">Nur für dich sichtbar</p>
+      <p class="admin-title" id="admin-title">Bewerbungsphase</p>
+      <p class="admin-hint">Geschlossen sehen alle einen Hinweis statt des Formulars.</p>
+    </div>
+    <button type="button" class="switch" id="phase-switch" role="switch" aria-checked="true" aria-labelledby="admin-title">
+      <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+      <span class="switch-label" id="phase-label">Offen</span>
+    </button>
+    <p class="admin-status" id="admin-status" aria-live="polite"></p>
+  </section>
+
+  <header class="top">
+    <div class="brand">
+      <div class="emblem" aria-hidden="true">LA</div>
+      <div>
+        <p class="brand-name">LA Gang</p>
+        <p class="brand-sub">Discord-Server</p>
+      </div>
+    </div>
+    <span class="status when-open">Bewerbungen offen</span>
+    <span class="status status-closed when-closed">Bewerbungen geschlossen</span>
+  </header>
+
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="kicker"><span class="mark" aria-hidden="true"></span><p class="eyebrow">Bewerbung</p></div>
+    <h1 id="hero-title" class="when-open">Der LA Gang fehlt noch <span class="mention" id="hero-mention">@dein_name</span></h1>
+    <h1 class="when-closed">Bewerbungen sind gerade geschlossen</h1>
+    <p class="lede when-closed">Die LA Gang nimmt im Moment keine neuen Leute auf. Sobald die Bewerbungsphase wieder offen ist, findest du hier das Formular.</p>
+    <p class="closed-since when-closed" id="closed-since"></p>
+    <p class="lede when-open">Wir suchen Leute für alle vier Divisionen und Divisions Anführer. Füll das Formular aus, kopier deine fertige Bewerbung und schick sie per DM an <strong>xDanielx</strong>.</p>
+    <div class="wanted when-open">
+      <span class="eyebrow">Gesucht</span>
+      <button type="button" class="pill" data-t="member" data-d="1" data-pick="member" id="pill-d1" aria-pressed="false"><span class="dot" aria-hidden="true"></span>1. Division</button>
+      <button type="button" class="pill" data-t="member" data-d="2" data-pick="member" id="pill-d2" aria-pressed="false"><span class="dot" aria-hidden="true"></span>2. Division</button>
+      <button type="button" class="pill" data-t="member" data-d="3" data-pick="member" id="pill-d3" aria-pressed="false"><span class="dot" aria-hidden="true"></span>3. Division</button>
+      <button type="button" class="pill" data-t="member" data-d="4" data-pick="member" id="pill-d4" aria-pressed="false"><span class="dot" aria-hidden="true"></span>4. Division</button>
+      <button type="button" class="pill" data-t="leader" data-pick="leader" id="pill-leader" aria-pressed="false"><span class="dot" aria-hidden="true"></span>Divisions Anführer</button>
+    </div>
+  </section>
+
+  <noscript><p class="noscript">Das Formular braucht JavaScript. Bitte aktiviere es in deinem Browser.</p></noscript>
+
+  <form id="apply" class="when-open" novalidate>
+    <section id="step-role" aria-labelledby="h-role">
+      <div class="step-head">
+        <p class="eyebrow" id="s-1">Schritt 1 von 3</p>
+        <h2 id="h-role">Wofür bewirbst du dich?</h2>
+        <p>Jede Division hat einen Divisions Anführer, der sie leitet. Über allen stehen die Anführer der LA Gang.</p>
+      </div>
+      <div class="fields">
+        <div>
+          <div class="roles" role="radiogroup" aria-labelledby="h-role" aria-describedby="e-role">
+            <label class="role" data-t="member" for="role-member">
+              <input type="radio" name="role" value="member" id="role-member" required>
+              <span class="role-top"><span class="role-name">Mitglied</span><span class="role-check" aria-hidden="true"></span></span>
+              <span class="role-desc">Du wirst Teil der LA Gang und gehörst zu einer Division.</span>
+              <span class="reqs"><span>Freigabe durch xDanielx</span><span>Respekt gegenüber allen</span><span>Aktiv dabei sein</span></span>
+            </label>
+            <label class="role" data-t="leader" for="role-leader">
+              <input type="radio" name="role" value="leader" id="role-leader" required>
+              <span class="role-top"><span class="role-name">Divisions Anführer</span><span class="role-check" aria-hidden="true"></span></span>
+              <span class="role-desc">Du leitest eine Division, hältst sie zusammen und sprichst dich mit den Anführern ab.</span>
+              <span class="reqs"><span>Verantwortung übernehmen</span><span>Regelmäßig online</span><span>Ruhig, wenn es Stress gibt</span></span>
+            </label>
+          </div>
+          <p class="err" id="e-role"></p>
+        </div>
+
+        <fieldset class="field" aria-describedby="e-div">
+          <legend>Welche Division?</legend>
+          <div class="chips">
+            <label class="chip" for="div-1"><input type="radio" name="div" id="div-1" value="1" required><span>1. Division</span></label>
+            <label class="chip" for="div-2"><input type="radio" name="div" id="div-2" value="2"><span>2. Division</span></label>
+            <label class="chip" for="div-3"><input type="radio" name="div" id="div-3" value="3"><span>3. Division</span></label>
+            <label class="chip" for="div-4"><input type="radio" name="div" id="div-4" value="4"><span>4. Division</span></label>
+            <label class="chip" for="div-any"><input type="radio" name="div" id="div-any" value="any"><span>Egal, teilt mich ein</span></label>
+          </div>
+          <p class="err" id="e-div"></p>
+        </fieldset>
+      </div>
+    </section>
+
+    <section id="step-about" aria-labelledby="h-about">
+      <div class="step-head">
+        <p class="eyebrow" id="s-2">Schritt 2 von 3</p>
+        <h2 id="h-about">Über dich</h2>
+      </div>
+      <div class="fields">
+        <div class="row-2">
+          <div class="field">
+            <label for="f-user">Discord-Benutzername</label>
+            <p class="hint" id="h-user">Steht in deinem Profil unter dem Anzeigenamen.</p>
+            <div class="at"><input type="text" id="f-user" name="user" maxlength="33" placeholder="lena_06" autocomplete="off" autocapitalize="none" spellcheck="false" required aria-describedby="h-user e-user"></div>
+            <p class="err" id="e-user"></p>
+          </div>
+          <div class="field">
+            <label for="f-age">Alter</label>
+            <p class="hint" id="h-age">Nur die Zahl, zum Beispiel 16.</p>
+            <input type="text" id="f-age" name="age" inputmode="numeric" maxlength="2" autocomplete="off" required aria-describedby="h-age e-age">
+            <p class="err" id="e-age"></p>
+          </div>
+        </div>
+
+        <fieldset class="field" aria-describedby="e-freq">
+          <legend>Wie oft bist du online?</legend>
+          <div class="chips">
+            <label class="chip" for="freq-1"><input type="radio" name="freq" id="freq-1" value="Fast jeden Tag" required><span>Fast jeden Tag</span></label>
+            <label class="chip" for="freq-2"><input type="radio" name="freq" id="freq-2" value="Mehrmals pro Woche"><span>Mehrmals pro Woche</span></label>
+            <label class="chip" for="freq-3"><input type="radio" name="freq" id="freq-3" value="Ab und zu"><span>Ab und zu</span></label>
+          </div>
+          <p class="err" id="e-freq"></p>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>Wann bist du meistens online? <span class="opt">optional</span></legend>
+          <div class="chips">
+            <label class="chip" for="time-1"><input type="checkbox" name="times" id="time-1" value="nachmittags"><span>Nachmittags</span></label>
+            <label class="chip" for="time-2"><input type="checkbox" name="times" id="time-2" value="abends"><span>Abends</span></label>
+            <label class="chip" for="time-3"><input type="checkbox" name="times" id="time-3" value="nachts"><span>Nachts</span></label>
+            <label class="chip" for="time-4"><input type="checkbox" name="times" id="time-4" value="am Wochenende"><span>Am Wochenende</span></label>
+          </div>
+        </fieldset>
+      </div>
+    </section>
+
+    <section id="step-answers" aria-labelledby="h-answers">
+      <div class="step-head">
+        <p class="eyebrow" id="s-3">Schritt 3 von 3</p>
+        <h2 id="h-answers">Deine Antworten</h2>
+        <p>Schreib so, wie du auch im Chat schreibst. Ehrlich zählt mehr als perfekt.</p>
+      </div>
+      <div class="fields">
+        <div class="field">
+          <label for="f-why" id="l-why">Warum willst du dabei sein?</label>
+          <p class="hint" id="h-why">Erzähl kurz, wer du bist und was dich reizt. Mindestens 60 Zeichen.</p>
+          <textarea id="f-why" name="why" maxlength="600" required aria-describedby="h-why e-why"></textarea>
+          <div class="field-foot"><p class="err" id="e-why"></p><span class="count" id="c-why">0 von mind. 60</span></div>
+        </div>
+        <div class="field">
+          <label for="f-exp"><span id="l-exp">Was machst du gern?</span> <span class="opt">optional</span></label>
+          <p class="hint" id="h-exp">Spiele, Hobbys, Musik: alles zählt.</p>
+          <textarea id="f-exp" name="exp" maxlength="400" aria-describedby="h-exp"></textarea>
+          <div class="field-foot"><span class="count" id="c-exp">0 / 400</span></div>
+        </div>
+        <div class="field">
+          <span class="q-tag" id="t-scenario">Deine Frage</span>
+          <label class="q-label" for="f-scenario" id="l-scenario">Hier steht gleich deine Frage</label>
+          <p class="hint" id="h-scenario">Wähle oben aus, wofür du dich bewirbst, dann erscheint sie.</p>
+          <textarea id="f-scenario" name="scenario" maxlength="500" disabled required aria-describedby="h-scenario e-scenario"></textarea>
+          <div class="field-foot"><p class="err" id="e-scenario"></p><span class="count" id="c-scenario" hidden>0 / 500</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="finish">
+      <label class="confirm" for="f-rules">
+        <input type="checkbox" id="f-rules" name="rules" required aria-describedby="e-rules">
+        <span>Ich bin respektvoll zu allen und halte mich an die Regeln der LA Gang.</span>
+      </label>
+      <p class="err" id="e-rules"></p>
+      <div class="submit-row">
+        <button type="submit" class="btn btn-primary" id="submit">Bewerbung erstellen</button>
+        <span class="draft-note" id="draft-note">Dein Entwurf bleibt auf diesem Gerät gespeichert.</span>
+      </div>
+    </div>
+  </form>
+
+  <section class="closed when-closed" aria-labelledby="h-closed">
+    <p class="eyebrow">Fragen?</p>
+    <h2 id="h-closed">Schreib xDanielx auf Discord an</h2>
+    <div class="contact">
+      <span class="avatar" aria-hidden="true">X</span>
+      <span class="member-text">
+        <span class="contact-name">xDanielx</span>
+        <span class="contact-user">service_karte</span>
+      </span>
+    </div>
+  </section>
+
+  <section class="result when-open" id="result" aria-labelledby="h-result" tabindex="-1" hidden>
+    <div class="step-head">
+      <p class="eyebrow done">Fertig</p>
+      <h2 id="h-result">Jetzt nur noch per DM abschicken</h2>
+    </div>
+    <div class="member">
+      <span class="avatar" id="m-avatar" aria-hidden="true">D</span>
+      <span class="member-text">
+        <span class="member-name" id="m-name">@dein_name</span>
+        <span class="member-role" id="m-role">So würde dein Name in der LA Gang aussehen</span>
+      </span>
+    </div>
+    <ol class="handoff">
+      <li id="step-copy">
+        <div class="handoff-body">
+          <h3>Bewerbung kopieren</h3>
+          <p class="split-note" id="split-note" hidden>Discord erlaubt 2.000 Zeichen pro Nachricht. Schick die Teile direkt nacheinander.</p>
+          <div id="msgs"></div>
+          <p class="copy-status" id="copy-status" aria-live="polite"></p>
+        </div>
+      </li>
+      <li>
+        <div class="handoff-body">
+          <h3>Per DM an xDanielx schicken</h3>
+          <div class="contact">
+            <span class="avatar" aria-hidden="true">X</span>
+            <span class="member-text">
+              <span class="contact-name">xDanielx</span>
+              <span class="contact-user" id="owner-user">service_karte</span>
+            </span>
+            <button type="button" class="btn btn-ghost btn-small" id="copy-owner">Namen kopieren</button>
+          </div>
+          <p class="copy-status" id="owner-status" aria-live="polite"></p>
+          <p>Seid ihr noch keine Freunde? Dann geh in Discord auf <strong>Freunde</strong>, dann <strong>Freund hinzufügen</strong>, und gib <strong>service_karte</strong> ein. Danach fügst du die Bewerbung in die DM ein.</p>
+          <a class="btn btn-ghost" id="open-discord" href="https://discord.com/app" target="_blank" rel="noopener noreferrer">Discord öffnen</a>
+        </div>
+      </li>
+      <li>
+        <div class="handoff-body">
+          <div class="variant" id="next-member">
+            <h3>Server beitreten</h3>
+            <p>Tritt über den Link dem Server bei. Neue Leute kommen erst rein, wenn xDanielx sie freigibt.</p>
+            <a class="btn btn-ghost" id="join-member" href="https://discord.gg/cBVaNgPVy" target="_blank" rel="noopener noreferrer">LA Gang beitreten</a>
+          </div>
+          <div class="variant" id="next-leader" hidden>
+            <h3>Auf Antwort warten</h3>
+            <p>xDanielx liest deine Bewerbung und meldet sich per DM bei dir. Bist du noch nicht auf dem Server, tritt schon mal über den Link bei.</p>
+            <a class="btn btn-ghost" id="join-leader" href="https://discord.gg/cBVaNgPVy" target="_blank" rel="noopener noreferrer">LA Gang beitreten</a>
+          </div>
+        </div>
+      </li>
+    </ol>
+    <p class="stale" id="stale" hidden>Ein Pflichtfeld ist gerade leer oder zu kurz. Der Text oben ist noch der vorherige.</p>
+    <div class="result-actions">
+      <button type="button" class="btn btn-ghost" id="edit">Antworten ändern</button>
+      <button type="button" class="btn btn-quiet" id="reset">Formular leeren</button>
+    </div>
+  </section>
+
+  <footer class="foot when-open">
+    <p>Diese Seite schickt nichts automatisch ab. Deine Bewerbung kommt erst bei xDanielx an, wenn du sie ihm selbst per DM schickst.</p>
+    <p>Fragen zur Bewerbung? Schreib xDanielx auf Discord an, sein Benutzername ist service_karte.</p>
+  </footer>
+</div>
+
+<script type="application/json" id="phase-data">{"open":true,"changedAt":"2026-10-05T11:16:10.288Z"}</script>
+<script type="application/json" id="page-src">"\u003ctitle>LA Gang Bewerbung\u003c/title>\n\u003clink rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n\u003clink rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n\u003clink rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Onest:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap\">\n\u003cstyle>\n/* Layout: one 46rem column on black. Red and blue are the crew's two colors: blue marks\n   Mitglied and the default selection state, red marks Divisions Anführer and every main action.\n   Green is the third accent: labels and step progress, the open status, requirements, and\n   everything that confirms (finished steps, met minimums, copied text, the rules checkbox).\n   Single dark theme on purpose, because black is part of the brief.\n   The application phase (open/closed) is baked into the page as data-phase; the owner's switch\n   republishes the page from the template kept in #page-src, so every visitor gets the new state. */\n:root {\n  color-scheme: dark;\n  --bg: #08080B;\n  --surface: #111117;\n  --field: #0C0C10;\n  --sunken: #1B1B23;\n  --ink: #F3F3F7;\n  --muted: #A0A0AD;\n  --line: #24242E;\n  --line-strong: #3B3B48;\n  --red: #D91A28;\n  --red-ink: #FF4D57;\n  --blue: #2458E0;\n  --blue-ink: #6B95FF;\n  --green: #3DDC84;\n  --white: #FFFFFF;\n  --font-display: \"Unbounded\", \"Arial Black\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-body: \"Onest\", system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif;\n  --font-mono: \"JetBrains Mono\", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;\n}\n\n*, *::before, *::after { box-sizing: border-box; }\n[hidden] { display: none !important; }\nbody {\n  background: var(--bg);\n  color: var(--ink);\n  font-family: var(--font-body);\n  font-size: 16px;\n  line-height: 1.55;\n  padding-inline: 16px;\n  -webkit-font-smoothing: antialiased;\n}\nh1, h2, h3, p { margin: 0; }\n::selection { background: var(--green); color: var(--bg); }\nbutton, input, textarea { font: inherit; color: inherit; }\n\n[data-t=\"member\"] { --c: var(--blue); --c-ink: var(--blue-ink); }\n[data-t=\"leader\"] { --c: var(--red); --c-ink: var(--red-ink); }\n\n.page {\n  --accent: var(--blue);\n  --accent-ink: var(--blue-ink);\n  --accent-soft: color-mix(in srgb, var(--accent) 24%, transparent);\n  max-width: 46rem;\n  margin-inline: auto;\n  padding-block: 24px 64px;\n  display: grid;\n  gap: 56px;\n}\n.page[data-type=\"leader\"] { --accent: var(--red); --accent-ink: var(--red-ink); }\n\n.eyebrow {\n  font-family: var(--font-mono);\n  font-size: 12px;\n  letter-spacing: .08em;\n  text-transform: uppercase;\n  color: var(--green);\n}\n.eyebrow.done::before {\n  content: \"✓\";\n  display: inline-grid;\n  place-items: center;\n  width: 16px;\n  height: 16px;\n  margin-right: 8px;\n  border-radius: 50%;\n  background: var(--green);\n  color: var(--bg);\n  font-size: 10px;\n  font-weight: 700;\n  vertical-align: 1px;\n}\n\n/* Server header */\n.top {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px 16px;\n}\n.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }\n.emblem {\n  width: 44px;\n  height: 44px;\n  flex: none;\n  border-radius: 14px;\n  background: linear-gradient(135deg, var(--red) 0 50%, var(--blue) 50% 100%);\n  color: var(--white);\n  display: grid;\n  place-items: center;\n  font-family: var(--font-display);\n  font-weight: 700;\n  font-size: 15px;\n  letter-spacing: -0.02em;\n}\n.brand-name { font-family: var(--font-display); font-weight: 600; font-size: 17px; line-height: 1.2; }\n.brand-sub { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }\n.status {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  padding: 6px 12px;\n  border: 1px solid color-mix(in srgb, var(--green) 45%, transparent);\n  border-radius: 999px;\n  font-size: 14px;\n  font-weight: 500;\n  color: var(--green);\n  background: color-mix(in srgb, var(--green) 10%, var(--surface));\n}\n.status::before {\n  content: \"\";\n  width: 8px;\n  height: 8px;\n  border-radius: 50%;\n  background: var(--green);\n  box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 22%, transparent);\n  animation: pulse 2.4s ease-in-out infinite;\n}\n@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }\n\n/* Hero */\n.hero { display: grid; gap: 20px; }\n.kicker { display: flex; align-items: center; gap: 12px; }\n.mark {\n  width: 60px;\n  height: 6px;\n  flex: none;\n  border-radius: 3px;\n  background: linear-gradient(90deg, var(--red) 0 40%, var(--blue) 40% 80%, var(--green) 80% 100%);\n}\n.hero h1 {\n  font-family: var(--font-display);\n  font-weight: 700;\n  font-size: clamp(2rem, 1.1rem + 4.6vw, 3.4rem);\n  line-height: 1.12;\n  letter-spacing: -0.02em;\n  text-wrap: balance;\n}\n.mention {\n  color: var(--accent-ink);\n  background: var(--accent-soft);\n  border-radius: .16em;\n  padding: 0 .14em;\n  -webkit-box-decoration-break: clone;\n  box-decoration-break: clone;\n  overflow-wrap: anywhere;\n  transition: color .3s ease, background-color .3s ease;\n}\n.lede { font-size: 1.125rem; color: var(--muted); max-width: 34rem; }\n.lede strong { color: var(--ink); font-weight: 600; }\n.wanted { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }\n.wanted .eyebrow { margin-right: 4px; }\n.pill {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  padding: 8px 14px 8px 12px;\n  border: 1px solid var(--line);\n  border-radius: 999px;\n  background: var(--surface);\n  font-size: 15px;\n  font-weight: 500;\n  cursor: pointer;\n  transition: border-color .2s ease, background-color .2s ease;\n}\n.pill:hover { border-color: var(--c-ink); }\n.pill[aria-pressed=\"true\"] {\n  border-color: var(--c-ink);\n  background: color-mix(in srgb, var(--c) 22%, var(--surface));\n}\n.pill:focus-visible { outline: 2px solid var(--c-ink); outline-offset: 2px; }\n.dot { width: 10px; height: 10px; flex: none; border-radius: 50%; background: var(--c-ink); }\n\n/* Form steps */\nform { display: grid; gap: 56px; }\n.step-head { display: grid; gap: 6px; margin-bottom: 20px; }\n.step-head h2 {\n  font-family: var(--font-display);\n  font-weight: 600;\n  font-size: 1.375rem;\n  line-height: 1.25;\n  letter-spacing: -0.01em;\n  text-wrap: balance;\n}\n.step-head p:not(.eyebrow) { color: var(--muted); max-width: 36rem; }\n\n/* Choice cards */\n.roles {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));\n  gap: 12px;\n}\n.role {\n  position: relative;\n  display: grid;\n  align-content: start;\n  gap: 10px;\n  padding: 18px;\n  border: 1px solid var(--line);\n  border-radius: 14px;\n  background: var(--surface);\n  cursor: pointer;\n  transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease;\n}\n.role:hover { border-color: var(--line-strong); }\n.role input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }\n.role-top { display: flex; align-items: center; gap: 10px; }\n.role-name { font-weight: 700; font-size: 1.125rem; color: var(--c-ink); }\n.role-check {\n  margin-left: auto;\n  width: 22px;\n  height: 22px;\n  flex: none;\n  border-radius: 50%;\n  border: 2px solid var(--line-strong);\n  display: grid;\n  place-items: center;\n}\n.role-desc { color: var(--muted); font-size: .95rem; }\n.reqs { display: flex; flex-wrap: wrap; gap: 6px; }\n.reqs span {\n  display: inline-flex;\n  align-items: center;\n  gap: 7px;\n  font-size: 13px;\n  line-height: 1.3;\n  padding: 5px 9px;\n  border-radius: 6px;\n  background: var(--sunken);\n}\n.reqs span::before {\n  content: \"✓\";\n  flex: none;\n  color: var(--green);\n  font-weight: 700;\n}\n.role:has(input:checked) {\n  border-color: var(--c-ink);\n  box-shadow: inset 0 0 0 1px var(--c-ink);\n  background: color-mix(in srgb, var(--c) 14%, var(--surface));\n}\n.role:has(input:checked) .role-check { border-color: var(--c-ink); background: var(--c); }\n.role:has(input:checked) .role-check::after {\n  content: \"\";\n  width: 8px;\n  height: 8px;\n  border-radius: 50%;\n  background: var(--white);\n}\n.role:has(input:focus-visible) { outline: 2px solid var(--c-ink); outline-offset: 3px; }\n.roles:has(input[aria-invalid=\"true\"]) .role { border-color: var(--red-ink); }\n\n/* Fields */\n.fields { display: grid; gap: 26px; }\n.row-2 {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));\n  gap: 26px;\n}\n.field { display: grid; gap: 6px; min-width: 0; }\nfieldset.field { border: 0; margin: 0; padding: 0; min-width: 0; display: block; }\nfieldset.field > legend { padding: 0; margin-bottom: 10px; }\n.field > label, fieldset.field > legend, .q-label { font-weight: 600; font-size: 1rem; line-height: 1.4; }\n.opt { font-weight: 400; font-size: .875rem; color: var(--muted); white-space: nowrap; }\n.hint { font-size: .875rem; color: var(--muted); }\ninput[type=\"text\"], textarea {\n  width: 100%;\n  font-size: 16px;\n  background: var(--field);\n  border: 1px solid var(--line-strong);\n  border-radius: 8px;\n  padding: 12px 14px;\n  transition: border-color .2s ease;\n}\ninput::placeholder, textarea::placeholder { color: var(--muted); opacity: .7; }\ntextarea { min-height: 8.5rem; resize: vertical; line-height: 1.5; }\ntextarea:disabled { background: var(--sunken); border-style: dashed; cursor: not-allowed; }\ninput[type=\"text\"]:focus-visible, textarea:focus-visible {\n  outline: 2px solid var(--accent-ink);\n  outline-offset: 1px;\n  border-color: var(--accent-ink);\n}\ninput[aria-invalid=\"true\"], textarea[aria-invalid=\"true\"] { border-color: var(--red-ink); }\n.at { position: relative; }\n.at::before {\n  content: \"@\";\n  position: absolute;\n  left: 14px;\n  top: 50%;\n  transform: translateY(-50%);\n  font-family: var(--font-mono);\n  color: var(--muted);\n  pointer-events: none;\n}\n.at input { padding-left: 34px; font-family: var(--font-mono); }\n.err { display: flex; align-items: baseline; gap: 7px; color: var(--red-ink); font-size: .875rem; font-weight: 500; }\n.err::before {\n  content: \"!\";\n  flex: none;\n  display: inline-grid;\n  place-items: center;\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: var(--red-ink);\n  color: var(--bg);\n  font-size: 11px;\n  font-weight: 700;\n  transform: translateY(2px);\n}\n.err:empty { display: none; }\n.field-foot { display: flex; align-items: flex-start; gap: 12px; }\n.count {\n  margin-left: auto;\n  font-family: var(--font-mono);\n  font-size: 12px;\n  color: var(--muted);\n  white-space: nowrap;\n  font-variant-numeric: tabular-nums;\n}\n.count.ok { color: var(--green); }\n.count.ok::before { content: \"✓ \"; }\n.q-tag {\n  justify-self: start;\n  font-family: var(--font-mono);\n  font-size: 12px;\n  letter-spacing: .06em;\n  text-transform: uppercase;\n  color: var(--accent-ink);\n  background: var(--accent-soft);\n  padding: 3px 8px;\n  border-radius: 5px;\n}\n\n/* Choice chips */\n.chips { display: flex; flex-wrap: wrap; gap: 8px; }\n.chip { position: relative; }\n.chip input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }\n.chip > span {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  padding: 9px 14px;\n  border: 1px solid var(--line-strong);\n  border-radius: 999px;\n  background: var(--field);\n  font-size: .95rem;\n  line-height: 1.3;\n  cursor: pointer;\n  user-select: none;\n  transition: background-color .2s ease, border-color .2s ease, color .2s ease;\n}\n.chip > span:hover { border-color: var(--accent-ink); }\n.chip input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--white); }\n.chip input:focus-visible + span { outline: 2px solid var(--accent-ink); outline-offset: 2px; }\n.chip input[aria-invalid=\"true\"] + span { border-color: var(--red-ink); }\nfieldset.field > .err { margin-top: 8px; }\n\n/* Finish */\n.finish { display: grid; gap: 16px; }\n.confirm { display: flex; align-items: flex-start; gap: 12px; font-weight: 500; cursor: pointer; }\n.confirm input { width: 22px; height: 22px; margin: 1px 0 0; flex: none; accent-color: var(--green); }\n.confirm input[aria-invalid=\"true\"] { outline: 2px solid var(--red-ink); outline-offset: 2px; }\n.submit-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }\n.draft-note { font-size: .875rem; color: var(--muted); }\n\n.btn {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  padding: 14px 22px;\n  border: 1px solid transparent;\n  border-radius: 12px;\n  font-size: 1rem;\n  font-weight: 600;\n  line-height: 1.2;\n  text-decoration: none;\n  cursor: pointer;\n  transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .1s ease;\n}\n.btn:active { transform: translateY(1px); }\n.btn:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }\n.btn-primary { background: var(--red); color: var(--white); }\n.btn-primary:hover { background: color-mix(in srgb, var(--red) 86%, var(--white)); }\n.btn-primary:focus-visible { outline-color: var(--red-ink); }\n.btn-ghost { background: var(--surface); border-color: var(--line-strong); color: var(--ink); }\n.btn-ghost:hover { border-color: var(--accent-ink); }\n.btn-small { padding: 10px 14px; font-size: .9375rem; border-radius: 10px; }\n.btn-quiet { background: none; color: var(--muted); padding-inline: 10px; text-decoration: underline; text-underline-offset: 3px; }\n.btn-quiet.armed { color: var(--red-ink); }\n.btn.copied, .btn.copied:hover { background: var(--green); border-color: var(--green); color: var(--bg); }\n.submit-row .btn { width: 100%; }\n\n/* Result */\n.result {\n  display: grid;\n  gap: 24px;\n  padding: 22px 18px;\n  border: 1px solid var(--line);\n  border-radius: 18px;\n  background: var(--surface);\n  box-shadow: 0 28px 60px -34px color-mix(in srgb, var(--accent) 70%, transparent);\n}\n.result:focus { outline: none; }\n.result .step-head { margin-bottom: 0; }\n.member {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  padding: 12px 14px;\n  border-radius: 12px;\n  background: var(--accent-soft);\n  min-width: 0;\n}\n.avatar {\n  width: 40px;\n  height: 40px;\n  flex: none;\n  border-radius: 50%;\n  background: var(--accent);\n  color: var(--white);\n  display: grid;\n  place-items: center;\n  font-family: var(--font-display);\n  font-weight: 700;\n  font-size: 16px;\n}\n.member-text { display: grid; min-width: 0; }\n.member-name { font-weight: 700; color: var(--accent-ink); overflow-wrap: anywhere; }\n.member-role { font-size: 13px; color: var(--muted); }\n.handoff { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; counter-reset: s; }\n.handoff > li {\n  display: grid;\n  grid-template-columns: 32px minmax(0, 1fr);\n  gap: 12px;\n  counter-increment: s;\n}\n.handoff > li::before {\n  content: counter(s);\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  border: 1.5px solid var(--accent-ink);\n  color: var(--accent-ink);\n  display: grid;\n  place-items: center;\n  font-family: var(--font-mono);\n  font-weight: 600;\n  font-size: 14px;\n}\n.handoff > li.done::before { content: \"✓\"; background: var(--green); border-color: var(--green); color: var(--bg); }\n.handoff-body, .variant { display: grid; gap: 10px; min-width: 0; justify-items: start; }\n.handoff-body > *, .variant > * { max-width: 100%; }\n.handoff h3 { font-size: 1.0625rem; font-weight: 700; padding-top: 4px; }\n.handoff p { color: var(--muted); }\n.handoff p strong { color: var(--ink); font-weight: 600; }\n#msgs { display: grid; gap: 18px; width: 100%; }\n.msg { display: grid; gap: 8px; min-width: 0; }\n.msg-part { font-family: var(--font-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }\n.msg-text {\n  margin: 0;\n  max-height: 20rem;\n  overflow: auto;\n  padding: 14px;\n  border: 1px solid var(--line);\n  border-radius: 10px;\n  background: var(--field);\n  font-family: var(--font-mono);\n  font-size: 13px;\n  line-height: 1.6;\n  white-space: pre-wrap;\n  overflow-wrap: anywhere;\n}\n.msg-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }\n.msg-foot .count { margin-left: 0; }\n.msg-foot .btn { width: 100%; }\n.contact {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  gap: 12px;\n  width: 100%;\n  padding: 12px 14px;\n  border: 1px solid var(--line);\n  border-radius: 12px;\n  background: var(--field);\n}\n.contact .avatar { background: var(--ink); color: var(--bg); }\n.contact .member-text { flex: 1 1 8rem; }\n.contact-name { font-weight: 700; }\n.contact-user { font-family: var(--font-mono); font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }\n.contact-user::before { content: \"@\"; }\n.copy-status { font-size: .875rem; color: var(--muted); }\n.copy-status.ok { color: var(--green); }\n.copy-status:empty { display: none; }\n.split-note { font-size: .875rem; color: var(--muted); }\n.stale { font-size: .9rem; font-weight: 500; color: var(--red-ink); }\n.result-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }\n\n/* Footer */\n.foot { display: grid; gap: 8px; padding-top: 20px; border-top: 1px solid var(--line); font-size: .875rem; color: var(--muted); }\n.noscript { padding: 14px; border-radius: 10px; background: var(--sunken); }\n\n/* Phase: open or closed */\n.page[data-phase=\"closed\"] .when-open { display: none !important; }\n.page:not([data-phase=\"closed\"]) .when-closed { display: none !important; }\n.status-closed {\n  color: var(--red-ink);\n  border-color: color-mix(in srgb, var(--red-ink) 45%, transparent);\n  background: color-mix(in srgb, var(--red) 12%, var(--surface));\n}\n.status-closed::before {\n  background: var(--red-ink);\n  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red-ink) 22%, transparent);\n  animation: none;\n}\n.closed-since { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }\n.closed-since:empty { display: none; }\n.closed {\n  display: grid;\n  gap: 12px;\n  padding: 22px 18px;\n  border: 1px solid var(--line);\n  border-radius: 18px;\n  background: var(--surface);\n}\n.closed h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; line-height: 1.3; }\n\n/* Owner panel with the phase switch */\n.admin {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px 16px;\n  padding: 16px 18px;\n  border: 1px dashed color-mix(in srgb, var(--green) 55%, transparent);\n  border-radius: 14px;\n  background: color-mix(in srgb, var(--green) 6%, var(--surface));\n}\n.admin-text { display: grid; gap: 4px; min-width: 0; flex: 1 1 14rem; }\n.admin-title { font-weight: 700; font-size: 1.0625rem; }\n.admin-hint { font-size: .875rem; color: var(--muted); }\n.admin-status { flex-basis: 100%; font-size: .875rem; color: var(--muted); }\n.admin-status:empty { display: none; }\n.admin-status.error { color: var(--red-ink); }\n.switch {\n  display: inline-flex;\n  align-items: center;\n  gap: 10px;\n  padding: 6px;\n  border: 0;\n  border-radius: 999px;\n  background: none;\n  cursor: pointer;\n}\n.switch:disabled { cursor: progress; opacity: .7; }\n.switch:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }\n.switch-track {\n  position: relative;\n  width: 52px;\n  height: 30px;\n  flex: none;\n  border-radius: 999px;\n  background: var(--red);\n  transition: background-color .2s ease;\n}\n.switch-thumb {\n  position: absolute;\n  top: 3px;\n  left: 3px;\n  width: 24px;\n  height: 24px;\n  border-radius: 50%;\n  background: var(--white);\n  transition: transform .2s ease;\n}\n.switch[aria-checked=\"true\"] .switch-track { background: var(--green); }\n.switch[aria-checked=\"true\"] .switch-thumb { transform: translateX(22px); }\n.switch-label { min-width: 6.5em; text-align: left; font-weight: 600; }\n\n@media (min-width: 40rem) {\n  .page { padding-block: 40px 96px; gap: 72px; }\n  form { gap: 64px; }\n  .step-head h2 { font-size: 1.625rem; }\n  .submit-row .btn { width: auto; }\n  .msg-foot .btn { width: auto; margin-left: auto; }\n  .result { padding: 30px 28px; }\n}\n@media (prefers-reduced-motion: reduce) {\n  *, *::before, *::after { transition-duration: 0s !important; animation: none !important; }\n}\n\u003c/style>\n\n\u003cdiv class=\"page\" id=\"page\" data-phase=\"%%PHASE%%\">\n  \u003csection class=\"admin\" id=\"admin\" aria-labelledby=\"admin-title\" hidden>\n    \u003cdiv class=\"admin-text\">\n      \u003cp class=\"eyebrow\">Nur für dich sichtbar\u003c/p>\n      \u003cp class=\"admin-title\" id=\"admin-title\">Bewerbungsphase\u003c/p>\n      \u003cp class=\"admin-hint\">Geschlossen sehen alle einen Hinweis statt des Formulars.\u003c/p>\n    \u003c/div>\n    \u003cbutton type=\"button\" class=\"switch\" id=\"phase-switch\" role=\"switch\" aria-checked=\"true\" aria-labelledby=\"admin-title\">\n      \u003cspan class=\"switch-track\" aria-hidden=\"true\">\u003cspan class=\"switch-thumb\">\u003c/span>\u003c/span>\n      \u003cspan class=\"switch-label\" id=\"phase-label\">Offen\u003c/span>\n    \u003c/button>\n    \u003cp class=\"admin-status\" id=\"admin-status\" aria-live=\"polite\">\u003c/p>\n  \u003c/section>\n\n  \u003cheader class=\"top\">\n    \u003cdiv class=\"brand\">\n      \u003cdiv class=\"emblem\" aria-hidden=\"true\">LA\u003c/div>\n      \u003cdiv>\n        \u003cp class=\"brand-name\">LA Gang\u003c/p>\n        \u003cp class=\"brand-sub\">Discord-Server\u003c/p>\n      \u003c/div>\n    \u003c/div>\n    \u003cspan class=\"status when-open\">Bewerbungen offen\u003c/span>\n    \u003cspan class=\"status status-closed when-closed\">Bewerbungen geschlossen\u003c/span>\n  \u003c/header>\n\n  \u003csection class=\"hero\" aria-labelledby=\"hero-title\">\n    \u003cdiv class=\"kicker\">\u003cspan class=\"mark\" aria-hidden=\"true\">\u003c/span>\u003cp class=\"eyebrow\">Bewerbung\u003c/p>\u003c/div>\n    \u003ch1 id=\"hero-title\" class=\"when-open\">Der LA Gang fehlt noch \u003cspan class=\"mention\" id=\"hero-mention\">@dein_name\u003c/span>\u003c/h1>\n    \u003ch1 class=\"when-closed\">Bewerbungen sind gerade geschlossen\u003c/h1>\n    \u003cp class=\"lede when-closed\">Die LA Gang nimmt im Moment keine neuen Leute auf. Sobald die Bewerbungsphase wieder offen ist, findest du hier das Formular.\u003c/p>\n    \u003cp class=\"closed-since when-closed\" id=\"closed-since\">\u003c/p>\n    \u003cp class=\"lede when-open\">Wir suchen Leute für alle vier Divisionen und Divisions Anführer. Füll das Formular aus, kopier deine fertige Bewerbung und schick sie per DM an \u003cstrong>xDanielx\u003c/strong>.\u003c/p>\n    \u003cdiv class=\"wanted when-open\">\n      \u003cspan class=\"eyebrow\">Gesucht\u003c/span>\n      \u003cbutton type=\"button\" class=\"pill\" data-t=\"member\" data-d=\"1\" data-pick=\"member\" id=\"pill-d1\" aria-pressed=\"false\">\u003cspan class=\"dot\" aria-hidden=\"true\">\u003c/span>1. Division\u003c/button>\n      \u003cbutton type=\"button\" class=\"pill\" data-t=\"member\" data-d=\"2\" data-pick=\"member\" id=\"pill-d2\" aria-pressed=\"false\">\u003cspan class=\"dot\" aria-hidden=\"true\">\u003c/span>2. Division\u003c/button>\n      \u003cbutton type=\"button\" class=\"pill\" data-t=\"member\" data-d=\"3\" data-pick=\"member\" id=\"pill-d3\" aria-pressed=\"false\">\u003cspan class=\"dot\" aria-hidden=\"true\">\u003c/span>3. Division\u003c/button>\n      \u003cbutton type=\"button\" class=\"pill\" data-t=\"member\" data-d=\"4\" data-pick=\"member\" id=\"pill-d4\" aria-pressed=\"false\">\u003cspan class=\"dot\" aria-hidden=\"true\">\u003c/span>4. Division\u003c/button>\n      \u003cbutton type=\"button\" class=\"pill\" data-t=\"leader\" data-pick=\"leader\" id=\"pill-leader\" aria-pressed=\"false\">\u003cspan class=\"dot\" aria-hidden=\"true\">\u003c/span>Divisions Anführer\u003c/button>\n    \u003c/div>\n  \u003c/section>\n\n  \u003cnoscript>\u003cp class=\"noscript\">Das Formular braucht JavaScript. Bitte aktiviere es in deinem Browser.\u003c/p>\u003c/noscript>\n\n  \u003cform id=\"apply\" class=\"when-open\" novalidate>\n    \u003csection id=\"step-role\" aria-labelledby=\"h-role\">\n      \u003cdiv class=\"step-head\">\n        \u003cp class=\"eyebrow\" id=\"s-1\">Schritt 1 von 3\u003c/p>\n        \u003ch2 id=\"h-role\">Wofür bewirbst du dich?\u003c/h2>\n        \u003cp>Jede Division hat einen Divisions Anführer, der sie leitet. Über allen stehen die Anführer der LA Gang.\u003c/p>\n      \u003c/div>\n      \u003cdiv class=\"fields\">\n        \u003cdiv>\n          \u003cdiv class=\"roles\" role=\"radiogroup\" aria-labelledby=\"h-role\" aria-describedby=\"e-role\">\n            \u003clabel class=\"role\" data-t=\"member\" for=\"role-member\">\n              \u003cinput type=\"radio\" name=\"role\" value=\"member\" id=\"role-member\" required>\n              \u003cspan class=\"role-top\">\u003cspan class=\"role-name\">Mitglied\u003c/span>\u003cspan class=\"role-check\" aria-hidden=\"true\">\u003c/span>\u003c/span>\n              \u003cspan class=\"role-desc\">Du wirst Teil der LA Gang und gehörst zu einer Division.\u003c/span>\n              \u003cspan class=\"reqs\">\u003cspan>Freigabe durch xDanielx\u003c/span>\u003cspan>Respekt gegenüber allen\u003c/span>\u003cspan>Aktiv dabei sein\u003c/span>\u003c/span>\n            \u003c/label>\n            \u003clabel class=\"role\" data-t=\"leader\" for=\"role-leader\">\n              \u003cinput type=\"radio\" name=\"role\" value=\"leader\" id=\"role-leader\" required>\n              \u003cspan class=\"role-top\">\u003cspan class=\"role-name\">Divisions Anführer\u003c/span>\u003cspan class=\"role-check\" aria-hidden=\"true\">\u003c/span>\u003c/span>\n              \u003cspan class=\"role-desc\">Du leitest eine Division, hältst sie zusammen und sprichst dich mit den Anführern ab.\u003c/span>\n              \u003cspan class=\"reqs\">\u003cspan>Verantwortung übernehmen\u003c/span>\u003cspan>Regelmäßig online\u003c/span>\u003cspan>Ruhig, wenn es Stress gibt\u003c/span>\u003c/span>\n            \u003c/label>\n          \u003c/div>\n          \u003cp class=\"err\" id=\"e-role\">\u003c/p>\n        \u003c/div>\n\n        \u003cfieldset class=\"field\" aria-describedby=\"e-div\">\n          \u003clegend>Welche Division?\u003c/legend>\n          \u003cdiv class=\"chips\">\n            \u003clabel class=\"chip\" for=\"div-1\">\u003cinput type=\"radio\" name=\"div\" id=\"div-1\" value=\"1\" required>\u003cspan>1. Division\u003c/span>\u003c/label>\n            \u003clabel class=\"chip\" for=\"div-2\">\u003cinput type=\"radio\" name=\"div\" id=\"div-2\" value=\"2\">\u003cspan>2. Division\u003c/span>\u003c/label>\n            \u003clabel class=\"chip\" for=\"div-3\">\u003cinput type=\"radio\" name=\"div\" id=\"div-3\" value=\"3\">\u003cspan>3. Division\u003c/span>\u003c/label>\n            \u003clabel class=\"chip\" for=\"div-4\">\u003cinput type=\"radio\" name=\"div\" id=\"div-4\" value=\"4\">\u003cspan>4. Division\u003c/span>\u003c/label>\n            \u003clabel class=\"chip\" for=\"div-any\">\u003cinput type=\"radio\" name=\"div\" id=\"div-any\" value=\"any\">\u003cspan>Egal, teilt mich ein\u003c/span>\u003c/label>\n          \u003c/div>\n          \u003cp class=\"err\" id=\"e-div\">\u003c/p>\n        \u003c/fieldset>\n      \u003c/div>\n    \u003c/section>\n\n    \u003csection id=\"step-about\" aria-labelledby=\"h-about\">\n      \u003cdiv class=\"step-head\">\n        \u003cp class=\"eyebrow\" id=\"s-2\">Schritt 2 von 3\u003c/p>\n        \u003ch2 id=\"h-about\">Über dich\u003c/h2>\n      \u003c/div>\n      \u003cdiv class=\"fields\">\n        \u003cdiv class=\"row-2\">\n          \u003cdiv class=\"field\">\n            \u003clabel for=\"f-user\">Discord-Benutzername\u003c/label>\n            \u003cp class=\"hint\" id=\"h-user\">Steht in deinem Profil unter dem Anzeigenamen.\u003c/p>\n            \u003cdiv class=\"at\">\u003cinput type=\"text\" id=\"f-user\" name=\"user\" maxlength=\"33\" placeholder=\"lena_06\" autocomplete=\"off\" autocapitalize=\"none\" spellcheck=\"false\" required aria-describedby=\"h-user e-user\">\u003c/div>\n            \u003cp class=\"err\" id=\"e-user\">\u003c/p>\n          \u003c/div>\n          \u003cdiv class=\"field\">\n            \u003clabel for=\"f-age\">Alter\u003c/label>\n            \u003cp class=\"hint\" id=\"h-age\">Nur die Zahl, zum Beispiel 16.\u003c/p>\n            \u003cinput type=\"text\" id=\"f-age\" name=\"age\" inputmode=\"numeric\" maxlength=\"2\" autocomplete=\"off\" required aria-describedby=\"h-age e-age\">\n            \u003cp class=\"err\" id=\"e-age\">\u003c/p>\n          \u003c/div>\n        \u003c/div>\n\n        \u003cfieldset class=\"field\" aria-describedby=\"e-freq\">\n          \u003clegend>Wie oft bist du online?\u003c/legend>\n          \u003cdiv class=\"chips\">\n            \u003clabel class=\"chip\" for=\"freq-1\">\u003cinput type=\"radio\" name=\"freq\" id=\"freq-1\" value=\"Fast jeden Tag\" required>\u003cspan>Fast jeden Tag\u003c/span>\u003c/label>\n            \u003clabel class=\"chip\" for=\"freq-2\">\u003cinput type=\"radio\" name=\"freq\" id=\"freq-2\" value=\"Mehrmals pro Woche\">\u003cspan>Mehrmals pro Woche\u003c/span>\u003c/label>\n            \u003clabel class=\"chip\" for=\"freq-3\">\u003cinput type=\"radio\" name=\"freq\" id=\"freq-3\" value=\"Ab und zu\">\u003cspan>Ab und zu\u003c/span>\u003c/label>\n          \u003c/div>\n          \u003cp class=\"err\" id=\"e-freq\">\u003c/p>\n        \u003c/fieldset>\n\n        \u003cfieldset class=\"field\">\n          \u003clegend>Wann bist du meistens online? \u003cspan class=\"opt\">optional\u003c/span>\u003c/legend>\n          \u003cdiv class=\"chips\">\n            \u003clabel class=\"chip\" for=\"time-1\">\u003cinput type=\"checkbox\" name=\"times\" id=\"time-1\" value=\"nachmittags\">\u003cspan>Nachmittags\u003c/span>\u003c/label>\n            \u003clabel class=\"chip\" for=\"time-2\">\u003cinput type=\"checkbox\" name=\"times\" id=\"time-2\" value=\"abends\">\u003cspan>Abends\u003c/span>\u003c/label>\n            \u003clabel class=\"chip\" for=\"time-3\">\u003cinput type=\"checkbox\" name=\"times\" id=\"time-3\" value=\"nachts\">\u003cspan>Nachts\u003c/span>\u003c/label>\n            \u003clabel class=\"chip\" for=\"time-4\">\u003cinput type=\"checkbox\" name=\"times\" id=\"time-4\" value=\"am Wochenende\">\u003cspan>Am Wochenende\u003c/span>\u003c/label>\n          \u003c/div>\n        \u003c/fieldset>\n      \u003c/div>\n    \u003c/section>\n\n    \u003csection id=\"step-answers\" aria-labelledby=\"h-answers\">\n      \u003cdiv class=\"step-head\">\n        \u003cp class=\"eyebrow\" id=\"s-3\">Schritt 3 von 3\u003c/p>\n        \u003ch2 id=\"h-answers\">Deine Antworten\u003c/h2>\n        \u003cp>Schreib so, wie du auch im Chat schreibst. Ehrlich zählt mehr als perfekt.\u003c/p>\n      \u003c/div>\n      \u003cdiv class=\"fields\">\n        \u003cdiv class=\"field\">\n          \u003clabel for=\"f-why\" id=\"l-why\">Warum willst du dabei sein?\u003c/label>\n          \u003cp class=\"hint\" id=\"h-why\">Erzähl kurz, wer du bist und was dich reizt. Mindestens 60 Zeichen.\u003c/p>\n          \u003ctextarea id=\"f-why\" name=\"why\" maxlength=\"600\" required aria-describedby=\"h-why e-why\">\u003c/textarea>\n          \u003cdiv class=\"field-foot\">\u003cp class=\"err\" id=\"e-why\">\u003c/p>\u003cspan class=\"count\" id=\"c-why\">0 von mind. 60\u003c/span>\u003c/div>\n        \u003c/div>\n        \u003cdiv class=\"field\">\n          \u003clabel for=\"f-exp\">\u003cspan id=\"l-exp\">Was machst du gern?\u003c/span> \u003cspan class=\"opt\">optional\u003c/span>\u003c/label>\n          \u003cp class=\"hint\" id=\"h-exp\">Spiele, Hobbys, Musik: alles zählt.\u003c/p>\n          \u003ctextarea id=\"f-exp\" name=\"exp\" maxlength=\"400\" aria-describedby=\"h-exp\">\u003c/textarea>\n          \u003cdiv class=\"field-foot\">\u003cspan class=\"count\" id=\"c-exp\">0 / 400\u003c/span>\u003c/div>\n        \u003c/div>\n        \u003cdiv class=\"field\">\n          \u003cspan class=\"q-tag\" id=\"t-scenario\">Deine Frage\u003c/span>\n          \u003clabel class=\"q-label\" for=\"f-scenario\" id=\"l-scenario\">Hier steht gleich deine Frage\u003c/label>\n          \u003cp class=\"hint\" id=\"h-scenario\">Wähle oben aus, wofür du dich bewirbst, dann erscheint sie.\u003c/p>\n          \u003ctextarea id=\"f-scenario\" name=\"scenario\" maxlength=\"500\" disabled required aria-describedby=\"h-scenario e-scenario\">\u003c/textarea>\n          \u003cdiv class=\"field-foot\">\u003cp class=\"err\" id=\"e-scenario\">\u003c/p>\u003cspan class=\"count\" id=\"c-scenario\" hidden>0 / 500\u003c/span>\u003c/div>\n        \u003c/div>\n      \u003c/div>\n    \u003c/section>\n\n    \u003cdiv class=\"finish\">\n      \u003clabel class=\"confirm\" for=\"f-rules\">\n        \u003cinput type=\"checkbox\" id=\"f-rules\" name=\"rules\" required aria-describedby=\"e-rules\">\n        \u003cspan>Ich bin respektvoll zu allen und halte mich an die Regeln der LA Gang.\u003c/span>\n      \u003c/label>\n      \u003cp class=\"err\" id=\"e-rules\">\u003c/p>\n      \u003cdiv class=\"submit-row\">\n        \u003cbutton type=\"submit\" class=\"btn btn-primary\" id=\"submit\">Bewerbung erstellen\u003c/button>\n        \u003cspan class=\"draft-note\" id=\"draft-note\">Dein Entwurf bleibt auf diesem Gerät gespeichert.\u003c/span>\n      \u003c/div>\n    \u003c/div>\n  \u003c/form>\n\n  \u003csection class=\"closed when-closed\" aria-labelledby=\"h-closed\">\n    \u003cp class=\"eyebrow\">Fragen?\u003c/p>\n    \u003ch2 id=\"h-closed\">Schreib xDanielx auf Discord an\u003c/h2>\n    \u003cdiv class=\"contact\">\n      \u003cspan class=\"avatar\" aria-hidden=\"true\">X\u003c/span>\n      \u003cspan class=\"member-text\">\n        \u003cspan class=\"contact-name\">xDanielx\u003c/span>\n        \u003cspan class=\"contact-user\">service_karte\u003c/span>\n      \u003c/span>\n    \u003c/div>\n  \u003c/section>\n\n  \u003csection class=\"result when-open\" id=\"result\" aria-labelledby=\"h-result\" tabindex=\"-1\" hidden>\n    \u003cdiv class=\"step-head\">\n      \u003cp class=\"eyebrow done\">Fertig\u003c/p>\n      \u003ch2 id=\"h-result\">Jetzt nur noch per DM abschicken\u003c/h2>\n    \u003c/div>\n    \u003cdiv class=\"member\">\n      \u003cspan class=\"avatar\" id=\"m-avatar\" aria-hidden=\"true\">D\u003c/span>\n      \u003cspan class=\"member-text\">\n        \u003cspan class=\"member-name\" id=\"m-name\">@dein_name\u003c/span>\n        \u003cspan class=\"member-role\" id=\"m-role\">So würde dein Name in der LA Gang aussehen\u003c/span>\n      \u003c/span>\n    \u003c/div>\n    \u003col class=\"handoff\">\n      \u003cli id=\"step-copy\">\n        \u003cdiv class=\"handoff-body\">\n          \u003ch3>Bewerbung kopieren\u003c/h3>\n          \u003cp class=\"split-note\" id=\"split-note\" hidden>Discord erlaubt 2.000 Zeichen pro Nachricht. Schick die Teile direkt nacheinander.\u003c/p>\n          \u003cdiv id=\"msgs\">\u003c/div>\n          \u003cp class=\"copy-status\" id=\"copy-status\" aria-live=\"polite\">\u003c/p>\n        \u003c/div>\n      \u003c/li>\n      \u003cli>\n        \u003cdiv class=\"handoff-body\">\n          \u003ch3>Per DM an xDanielx schicken\u003c/h3>\n          \u003cdiv class=\"contact\">\n            \u003cspan class=\"avatar\" aria-hidden=\"true\">X\u003c/span>\n            \u003cspan class=\"member-text\">\n              \u003cspan class=\"contact-name\">xDanielx\u003c/span>\n              \u003cspan class=\"contact-user\" id=\"owner-user\">service_karte\u003c/span>\n            \u003c/span>\n            \u003cbutton type=\"button\" class=\"btn btn-ghost btn-small\" id=\"copy-owner\">Namen kopieren\u003c/button>\n          \u003c/div>\n          \u003cp class=\"copy-status\" id=\"owner-status\" aria-live=\"polite\">\u003c/p>\n          \u003cp>Seid ihr noch keine Freunde? Dann geh in Discord auf \u003cstrong>Freunde\u003c/strong>, dann \u003cstrong>Freund hinzufügen\u003c/strong>, und gib \u003cstrong>service_karte\u003c/strong> ein. Danach fügst du die Bewerbung in die DM ein.\u003c/p>\n          \u003ca class=\"btn btn-ghost\" id=\"open-discord\" href=\"https://discord.com/app\" target=\"_blank\" rel=\"noopener noreferrer\">Discord öffnen\u003c/a>\n        \u003c/div>\n      \u003c/li>\n      \u003cli>\n        \u003cdiv class=\"handoff-body\">\n          \u003cdiv class=\"variant\" id=\"next-member\">\n            \u003ch3>Server beitreten\u003c/h3>\n            \u003cp>Tritt über den Link dem Server bei. Neue Leute kommen erst rein, wenn xDanielx sie freigibt.\u003c/p>\n            \u003ca class=\"btn btn-ghost\" id=\"join-member\" href=\"https://discord.gg/cBVaNgPVy\" target=\"_blank\" rel=\"noopener noreferrer\">LA Gang beitreten\u003c/a>\n          \u003c/div>\n          \u003cdiv class=\"variant\" id=\"next-leader\" hidden>\n            \u003ch3>Auf Antwort warten\u003c/h3>\n            \u003cp>xDanielx liest deine Bewerbung und meldet sich per DM bei dir. Bist du noch nicht auf dem Server, tritt schon mal über den Link bei.\u003c/p>\n            \u003ca class=\"btn btn-ghost\" id=\"join-leader\" href=\"https://discord.gg/cBVaNgPVy\" target=\"_blank\" rel=\"noopener noreferrer\">LA Gang beitreten\u003c/a>\n          \u003c/div>\n        \u003c/div>\n      \u003c/li>\n    \u003c/ol>\n    \u003cp class=\"stale\" id=\"stale\" hidden>Ein Pflichtfeld ist gerade leer oder zu kurz. Der Text oben ist noch der vorherige.\u003c/p>\n    \u003cdiv class=\"result-actions\">\n      \u003cbutton type=\"button\" class=\"btn btn-ghost\" id=\"edit\">Antworten ändern\u003c/button>\n      \u003cbutton type=\"button\" class=\"btn btn-quiet\" id=\"reset\">Formular leeren\u003c/button>\n    \u003c/div>\n  \u003c/section>\n\n  \u003cfooter class=\"foot when-open\">\n    \u003cp>Diese Seite schickt nichts automatisch ab. Deine Bewerbung kommt erst bei xDanielx an, wenn du sie ihm selbst per DM schickst.\u003c/p>\n    \u003cp>Fragen zur Bewerbung? Schreib xDanielx auf Discord an, sein Benutzername ist service_karte.\u003c/p>\n  \u003c/footer>\n\u003c/div>\n\n\u003cscript type=\"application/json\" id=\"phase-data\">%%PHASE_JSON%%\u003c/script>\n\u003cscript type=\"application/json\" id=\"page-src\">%%PAGE_SRC%%\u003c/script>\n\u003cscript>\n(() => {\n  const TYPES = {\n    member: {\n      why: {\n        label: 'Warum willst du in die LA Gang?',\n        hint: 'Erzähl kurz, wer du bist und was du bei uns machen willst. Mindestens 60 Zeichen.',\n        min: 60,\n        head: 'Warum ich in die LA Gang will'\n      },\n      exp: { label: 'Was machst du gern?', hint: 'Spiele, Hobbys, Musik: alles zählt.', head: 'Was ich gern mache' },\n      q: {\n        tag: 'Frage für Mitglieder',\n        label: 'Woher kennst du die LA Gang? Kennst du schon jemanden von uns?',\n        hint: 'Zum Beispiel über Freunde oder einen anderen Server. Mindestens 10 Zeichen.',\n        min: 10,\n        max: 300,\n        head: 'Woher ich die LA Gang kenne'\n      }\n    },\n    leader: {\n      why: {\n        label: 'Warum willst du eine Division anführen?',\n        hint: 'Was reizt dich daran und warum passt du dafür? Mindestens 80 Zeichen.',\n        min: 80,\n        head: 'Warum ich eine Division anführen will'\n      },\n      exp: { label: 'Hast du schon mal eine Gruppe geleitet?', hint: 'Andere Server, Clans, Teams, Schule oder Verein zählen auch.', head: 'Erfahrung als Anführer' },\n      q: {\n        tag: 'Frage für Divisions Anführer',\n        label: 'Zwei aus deiner Division streiten sich und die anderen haben keine Lust mehr. Was machst du?',\n        hint: 'Was machst du zuerst, was danach? Mindestens 60 Zeichen.',\n        min: 60,\n        max: 500,\n        head: 'Rollenfrage: Streit in der Division'\n      }\n    }\n  };\n  const DEFAULTS = {\n    why: { label: 'Warum willst du dabei sein?', hint: 'Erzähl kurz, wer du bist und was dich reizt. Mindestens 60 Zeichen.', min: 60 },\n    exp: { label: 'Was machst du gern?', hint: 'Spiele, Hobbys, Musik: alles zählt.' },\n    q: { tag: 'Deine Frage', label: 'Hier steht gleich deine Frage', hint: 'Wähle oben aus, wofür du dich bewirbst, dann erscheint sie.' }\n  };\n  const DIVS = ['1', '2', '3', '4'];\n  const DISCORD_LIMIT = 2000;\n  const STORE_KEY = 'la-gang-bewerbung-v2';\n  const OWNER_USER = 'service_karte';\n  const ORDER = ['role', 'div', 'user', 'age', 'freq', 'why', 'scenario', 'rules'];\n  const ID_OF = { user: 'f-user', age: 'f-age', why: 'f-why', scenario: 'f-scenario', rules: 'f-rules' };\n  const KEY_BY_ID = { 'f-user': 'user', 'f-age': 'age', 'f-why': 'why', 'f-scenario': 'scenario', 'f-rules': 'rules' };\n\n  const $ = (id) => document.getElementById(id);\n  const page = $('page');\n  const form = $('apply');\n  const reduceMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;\n  const blankScenarios = () => ({ member: '', leader: '' });\n\n  const state = { type: '', div: '', scenario: blankScenarios() };\n  const touched = new Set();\n  let showAll = false;\n  let resultShown = false;\n  let lastMsgKey = '';\n  const STEP_KEYS = [['role', 'div'], ['user', 'age', 'freq'], ['why', 'scenario']];\n\n  const go = (el, block) => el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: block || 'start' });\n  const radios = (name) => Array.from(form.querySelectorAll('input[name=\"' + name + '\"]'));\n  const checkedValue = (name) => { const el = radios(name).find((i) => i.checked); return el ? el.value : ''; };\n  const checkedValues = (name) => radios(name).filter((i) => i.checked).map((i) => i.value);\n  const normUser = (v) => String(v || '').trim().replace(/^@+/, '').toLowerCase();\n  const validUser = (u) => /^[a-z0-9_.]{2,32}$/.test(u) && !/\\.\\./.test(u);\n  const fmt = (n) => n.toLocaleString('de-DE');\n  const joinDe = (list) => list.length \u003c 2 ? list.join('') : list.slice(0, -1).join(', ') + ' und ' + list[list.length - 1];\n  const whyMin = () => (TYPES[state.type] ? TYPES[state.type].why.min : DEFAULTS.why.min);\n\n  /* The exact role names from the server */\n  function roleLabel(type, div) {\n    if (type === 'member') return DIVS.includes(div) ? div + '. Division' : 'Mitglied, Division egal';\n    return DIVS.includes(div) ? div + '. Divisions Anführer' : 'Divisions Anführer, Division egal';\n  }\n\n  function collect() {\n    return {\n      type: state.type,\n      div: state.div,\n      user: normUser($('f-user').value),\n      age: $('f-age').value.trim(),\n      freq: checkedValue('freq'),\n      times: checkedValues('times'),\n      why: $('f-why').value.trim(),\n      exp: $('f-exp').value.trim(),\n      scenario: state.type ? $('f-scenario').value.trim() : '',\n      rules: $('f-rules').checked\n    };\n  }\n\n  function validate(d) {\n    const e = {};\n    const t = TYPES[d.type];\n    const min = t ? t.why.min : DEFAULTS.why.min;\n    if (!t) e.role = 'Wähle aus, ob du Mitglied oder Divisions Anführer werden willst.';\n    if (!d.div) e.div = 'Wähle eine Division aus oder tippe auf „Egal, teilt mich ein“.';\n    if (!d.user) e.user = 'Gib deinen Discord-Benutzernamen ein.';\n    else if (!validUser(d.user)) e.user = 'Benutzernamen haben 2 bis 32 Zeichen: Kleinbuchstaben, Zahlen, Punkt und Unterstrich.';\n    if (!d.age) e.age = 'Gib dein Alter ein.';\n    else if (!/^\\d{1,2}$/.test(d.age)) e.age = 'Gib dein Alter als Zahl ein, zum Beispiel 16.';\n    if (!d.freq) e.freq = 'Wähle aus, wie oft du online bist.';\n    if (!d.why) e.why = 'Erzähl uns, warum du dabei sein willst.';\n    else if (d.why.length \u003c min) e.why = 'Noch ' + (min - d.why.length) + ' Zeichen bis zum Minimum von ' + min + '.';\n    if (!t) e.scenario = 'Wähle zuerst oben aus, wofür du dich bewirbst.';\n    else if (!d.scenario) e.scenario = 'Beantworte die Frage.';\n    else if (d.scenario.length \u003c t.q.min) e.scenario = 'Noch ' + (t.q.min - d.scenario.length) + ' Zeichen bis zum Minimum von ' + t.q.min + '.';\n    if (!d.rules) e.rules = 'Bestätige, dass du dich an die Regeln hältst.';\n    return e;\n  }\n\n  function inputsFor(k) {\n    if (k === 'role' || k === 'div' || k === 'freq') return radios(k);\n    return [$(ID_OF[k])];\n  }\n\n  function paint(errors) {\n    ORDER.forEach((k) => {\n      const msg = (showAll || touched.has(k)) ? (errors[k] || '') : '';\n      $('e-' + k).textContent = msg;\n      inputsFor(k).forEach((i) => {\n        if (msg) i.setAttribute('aria-invalid', 'true');\n        else i.removeAttribute('aria-invalid');\n      });\n    });\n  }\n\n  function count(id, el, min) {\n    const c = $(id);\n    const trimmed = el.value.trim().length;\n    if (min && trimmed \u003c min) {\n      c.textContent = trimmed + ' von mind. ' + min;\n      c.classList.remove('ok');\n    } else {\n      c.textContent = el.value.length + ' / ' + el.maxLength;\n      c.classList.toggle('ok', !!min);\n    }\n  }\n\n  function updateCounts() {\n    const t = TYPES[state.type];\n    count('c-why', $('f-why'), whyMin());\n    count('c-exp', $('f-exp'), 0);\n    const sc = $('f-scenario');\n    $('c-scenario').hidden = sc.disabled;\n    if (t) count('c-scenario', sc, t.q.min);\n  }\n\n  function updatePills() {\n    document.querySelectorAll('.pill').forEach((p) => {\n      const on = p.dataset.pick === 'leader'\n        ? state.type === 'leader'\n        : state.type === 'member' && state.div === p.dataset.d;\n      p.setAttribute('aria-pressed', String(on));\n    });\n  }\n\n  function setType(key) {\n    const ta = $('f-scenario');\n    if (state.type) state.scenario[state.type] = ta.value;\n    const t = TYPES[key];\n    state.type = t ? key : '';\n    if (t) page.dataset.type = key;\n    else delete page.dataset.type;\n    radios('role').forEach((i) => { i.checked = i.value === state.type; });\n    const why = t ? t.why : DEFAULTS.why;\n    const exp = t ? t.exp : DEFAULTS.exp;\n    const q = t ? t.q : DEFAULTS.q;\n    $('l-why').textContent = why.label;\n    $('h-why').textContent = why.hint;\n    $('l-exp').textContent = exp.label;\n    $('h-exp').textContent = exp.hint;\n    $('t-scenario').textContent = q.tag;\n    $('l-scenario').textContent = q.label;\n    $('h-scenario').textContent = q.hint;\n    ta.disabled = !t;\n    ta.maxLength = t ? t.q.max : 500;\n    ta.value = t ? (state.scenario[key] || '') : '';\n    updatePills();\n  }\n\n  function setDiv(value) {\n    state.div = DIVS.includes(value) || value === 'any' ? value : '';\n    radios('div').forEach((i) => { i.checked = i.value === state.div; });\n    updatePills();\n  }\n\n  /* Discord message: markdown the DM renders, @everyone/@here defused, 2000-character messages */\n  const defuse = (s) => s.replace(/@(everyone|here)/gi, '@​$1');\n  const quote = (t) => t.split(/\\r?\\n/).map((l) => l.trim()).filter(Boolean).map((l) => '> ' + defuse(l)).join('\\n');\n\n  function buildSections(d) {\n    const t = TYPES[d.type];\n    const online = d.freq + (d.times.length ? ', meist ' + joinDe(d.times) : '');\n    const head = [\n      '## Bewerbung für die LA Gang',\n      '**Rolle:** ' + roleLabel(d.type, d.div),\n      '**Discord:** @' + d.user,\n      '**Alter:** ' + d.age,\n      '**Online:** ' + online\n    ];\n    const sections = [head.join('\\n')];\n    sections.push('**' + t.why.head + '**\\n' + quote(d.why));\n    if (d.exp) sections.push('**' + t.exp.head + '**\\n' + quote(d.exp));\n    sections.push('**' + t.q.head + '**\\n' + quote(d.scenario));\n    sections.push('-# Regeln der LA Gang akzeptiert');\n    return sections;\n  }\n\n  function pack(sections) {\n    const out = [];\n    let cur = '';\n    sections.forEach((s) => {\n      const next = cur ? cur + '\\n\\n' + s : s;\n      if (next.length \u003c= DISCORD_LIMIT) cur = next;\n      else { if (cur) out.push(cur); cur = s; }\n    });\n    if (cur) out.push(cur);\n    return out;\n  }\n\n  async function copy(text, sourceEl, btn, label, statusId, okMsg) {\n    let ok = false;\n    try {\n      if (navigator.clipboard && navigator.clipboard.writeText) {\n        await navigator.clipboard.writeText(text);\n        ok = true;\n      }\n    } catch (err) { ok = false; }\n    if (!ok) {\n      try {\n        const sel = window.getSelection();\n        const range = document.createRange();\n        range.selectNodeContents(sourceEl);\n        sel.removeAllRanges();\n        sel.addRange(range);\n        ok = !!(document.execCommand && document.execCommand('copy'));\n      } catch (err) { ok = false; }\n    }\n    const status = $(statusId);\n    status.textContent = ok ? okMsg : 'Der Text ist markiert. Kopier ihn über das Menü deines Geräts.';\n    status.classList.toggle('ok', ok);\n    if (ok) {\n      btn.textContent = 'Kopiert';\n      btn.classList.add('copied');\n      if (statusId === 'copy-status') $('step-copy').classList.add('done');\n      clearTimeout(btn._reset);\n      btn._reset = setTimeout(() => { btn.textContent = label; btn.classList.remove('copied'); }, 2500);\n    }\n  }\n\n  function renderResult(d) {\n    $('m-avatar').textContent = d.user.charAt(0).toUpperCase();\n    $('m-name').textContent = '@' + d.user;\n    $('m-role').textContent = roleLabel(d.type, d.div) + ' · So würde dein Name in der LA Gang aussehen';\n    $('next-member').hidden = d.type !== 'member';\n    $('next-leader').hidden = d.type !== 'leader';\n    const msgs = pack(buildSections(d));\n    const key = msgs.join('\\u0000');\n    if (key === lastMsgKey) return;\n    lastMsgKey = key;\n    $('step-copy').classList.remove('done');\n    $('copy-status').textContent = '';\n    const box = $('msgs');\n    box.replaceChildren();\n    msgs.forEach((m, i) => {\n      const wrap = document.createElement('div');\n      wrap.className = 'msg';\n      if (msgs.length > 1) {\n        const part = document.createElement('p');\n        part.className = 'msg-part';\n        part.textContent = 'Nachricht ' + (i + 1) + ' von ' + msgs.length;\n        wrap.append(part);\n      }\n      const pre = document.createElement('pre');\n      pre.className = 'msg-text';\n      pre.id = 'out-' + (i + 1);\n      pre.tabIndex = 0;\n      pre.textContent = m;\n      const foot = document.createElement('div');\n      foot.className = 'msg-foot';\n      const cnt = document.createElement('span');\n      cnt.className = 'count';\n      cnt.textContent = fmt(m.length) + ' / ' + fmt(DISCORD_LIMIT) + ' Zeichen';\n      const label = msgs.length > 1 ? 'Teil ' + (i + 1) + ' kopieren' : 'Bewerbung kopieren';\n      const btn = document.createElement('button');\n      btn.type = 'button';\n      btn.className = 'btn btn-primary';\n      btn.id = 'copy-' + (i + 1);\n      btn.textContent = label;\n      btn.addEventListener('click', () => {\n        copy(m, pre, btn, label, 'copy-status', 'Kopiert. Jetzt in die DM an xDanielx einfügen.');\n      });\n      foot.append(cnt, btn);\n      wrap.append(pre, foot);\n      box.append(wrap);\n    });\n    $('split-note').hidden = msgs.length \u003c 2;\n  }\n\n  function showResult(scroll) {\n    resultShown = true;\n    $('result').hidden = false;\n    $('stale').hidden = true;\n    if (scroll) {\n      go($('result'));\n      $('result').focus({ preventScroll: true });\n    }\n  }\n\n  function updateHero(d) {\n    $('hero-mention').textContent = '@' + (validUser(d.user) ? d.user : 'dein_name');\n  }\n\n  function refresh() {\n    const d = collect();\n    const errors = validate(d);\n    paint(errors);\n    updateCounts();\n    updateHero(d);\n    STEP_KEYS.forEach((keys, i) => $('s-' + (i + 1)).classList.toggle('done', keys.every((k) => !errors[k])));\n    if (resultShown) {\n      if (Object.keys(errors).length === 0) { renderResult(d); $('stale').hidden = true; }\n      else $('stale').hidden = false;\n    }\n  }\n\n  /* Draft kept on this device only */\n  function draft() {\n    const sc = Object.assign({}, state.scenario);\n    if (state.type) sc[state.type] = $('f-scenario').value;\n    return {\n      v: 2,\n      type: state.type,\n      div: state.div,\n      user: $('f-user').value,\n      age: $('f-age').value,\n      freq: checkedValue('freq'),\n      times: checkedValues('times'),\n      why: $('f-why').value,\n      exp: $('f-exp').value,\n      scenario: sc,\n      rules: $('f-rules').checked,\n      result: resultShown\n    };\n  }\n  let saveTimer;\n  function save() {\n    try { localStorage.setItem(STORE_KEY, JSON.stringify(draft())); } catch (err) { /* storage unavailable */ }\n  }\n  function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); }\n  function loadDraft() {\n    try { const raw = localStorage.getItem(STORE_KEY); return raw ? JSON.parse(raw) : null; } catch (err) { return null; }\n  }\n  function storageWorks() {\n    try { localStorage.setItem('__probe', '1'); localStorage.removeItem('__probe'); return true; } catch (err) { return false; }\n  }\n\n  function applyDraft(dr) {\n    if (!dr || typeof dr !== 'object') { refresh(); return; }\n    const str = (v) => (typeof v === 'string' ? v : '');\n    $('f-user').value = str(dr.user);\n    $('f-age').value = str(dr.age);\n    $('f-why').value = str(dr.why);\n    $('f-exp').value = str(dr.exp);\n    radios('freq').forEach((i) => { i.checked = i.value === dr.freq; });\n    const times = Array.isArray(dr.times) ? dr.times : [];\n    radios('times').forEach((i) => { i.checked = times.includes(i.value); });\n    $('f-rules').checked = !!dr.rules;\n    const sc = blankScenarios();\n    if (dr.scenario && typeof dr.scenario === 'object') Object.keys(sc).forEach((k) => { sc[k] = str(dr.scenario[k]); });\n    state.type = '';\n    state.scenario = sc;\n    setType(TYPES[dr.type] ? dr.type : '');\n    setDiv(str(dr.div));\n    const d = collect();\n    if (dr.result && Object.keys(validate(d)).length === 0) { renderResult(d); showResult(false); }\n    refresh();\n  }\n\n  function clearAll() {\n    form.reset();\n    state.type = '';\n    state.scenario = blankScenarios();\n    setType('');\n    setDiv('');\n    touched.clear();\n    showAll = false;\n    resultShown = false;\n    $('result').hidden = true;\n    $('msgs').replaceChildren();\n    lastMsgKey = '';\n    $('step-copy').classList.remove('done');\n    $('copy-status').textContent = '';\n    $('owner-status').textContent = '';\n    try { localStorage.removeItem(STORE_KEY); } catch (err) { /* storage unavailable */ }\n    refresh();\n    go(document.querySelector('.hero'));\n  }\n\n  function focusField(k) {\n    let el;\n    if (k === 'role' || (k === 'scenario' && !state.type)) el = radios('role').find((i) => i.checked) || $('role-member');\n    else if (k === 'div' || k === 'freq') el = radios(k)[0];\n    else el = inputsFor(k)[0];\n    el.focus({ preventScroll: true });\n    go(el.closest('.field, .roles, .confirm') || el, 'center');\n  }\n\n  /* Events */\n  form.addEventListener('change', (ev) => {\n    const t = ev.target;\n    if (t.name === 'role' && t.checked) setType(t.value);\n    if (t.name === 'div' && t.checked) setDiv(t.value);\n    if (t.name) touched.add(t.name);\n    refresh();\n    scheduleSave();\n  });\n  form.addEventListener('input', () => { refresh(); scheduleSave(); });\n  form.addEventListener('focusout', (ev) => {\n    const k = KEY_BY_ID[ev.target.id];\n    if (!k) return;\n    if (ev.target.id === 'f-user') {\n      const n = normUser(ev.target.value);\n      if (n !== ev.target.value) { ev.target.value = n; scheduleSave(); }\n    }\n    if (ev.target.value || k === 'rules') touched.add(k);\n    refresh();\n  });\n  form.addEventListener('submit', (ev) => {\n    ev.preventDefault();\n    $('f-user').value = normUser($('f-user').value);\n    showAll = true;\n    const d = collect();\n    const errors = validate(d);\n    paint(errors);\n    updateHero(d);\n    const first = ORDER.find((k) => errors[k]);\n    if (first) { focusField(first); return; }\n    renderResult(d);\n    showResult(true);\n    save();\n  });\n\n  document.querySelectorAll('.pill').forEach((p) => {\n    p.addEventListener('click', () => {\n      if (p.dataset.pick === 'leader') {\n        setType('leader');\n      } else {\n        setType('member');\n        setDiv(p.dataset.d);\n        touched.add('div');\n      }\n      touched.add('role');\n      refresh();\n      scheduleSave();\n      go($('step-role'));\n      $('role-' + state.type).focus({ preventScroll: true });\n    });\n  });\n\n  const ownerBtn = $('copy-owner');\n  ownerBtn.addEventListener('click', () => {\n    copy(OWNER_USER, $('owner-user'), ownerBtn, 'Namen kopieren', 'owner-status', 'Benutzername kopiert. In Discord unter Freund hinzufügen einfügen.');\n  });\n\n  $('edit').addEventListener('click', () => go($('step-about')));\n\n  let armed = false;\n  let armTimer;\n  const resetBtn = $('reset');\n  function disarm() { armed = false; resetBtn.textContent = 'Formular leeren'; resetBtn.classList.remove('armed'); }\n  resetBtn.addEventListener('click', () => {\n    if (!armed) {\n      armed = true;\n      resetBtn.textContent = 'Wirklich alles löschen?';\n      resetBtn.classList.add('armed');\n      clearTimeout(armTimer);\n      armTimer = setTimeout(disarm, 4000);\n      return;\n    }\n    clearTimeout(armTimer);\n    disarm();\n    clearAll();\n  });\n\n  if (!storageWorks()) $('draft-note').hidden = true;\n\n  /* Bewerbungsphase: the state lives in #phase-data inside this page. The owner's switch renders the\n     whole page again from the template in #page-src with the new state and publishes it as a new version. */\n  const SKELETON_OPEN = '\u003c!doctype html>\u003chtml>\u003chead>\u003cmeta charset=utf8>\u003cmeta name=viewport content=\"width=device-width,initial-scale=1,viewport-fit=cover\">\u003cstyle>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}\u003c/style>\u003c/head>\u003cbody>';\n  const MARK = (k) => '%' + '%' + k + '%' + '%';\n  const safeJson = (v) => JSON.stringify(v).replace(/\u003c/g, '\\\\u003c');\n\n  function readPhase() {\n    try {\n      const p = JSON.parse($('phase-data').textContent);\n      return { open: p.open !== false, changedAt: typeof p.changedAt === 'string' ? p.changedAt : null };\n    } catch (err) {\n      return { open: true, changedAt: null };\n    }\n  }\n  const phase = readPhase();\n  if (!phase.open && phase.changedAt) {\n    const since = new Date(phase.changedAt);\n    if (!isNaN(since.getTime())) {\n      $('closed-since').textContent = 'Geschlossen seit ' + since.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });\n    }\n  }\n\n  function renderDocument(next) {\n    const tpl = JSON.parse($('page-src').textContent);\n    const body = tpl\n      .split(MARK('PHASE')).join(next.open ? 'open' : 'closed')\n      .split(MARK('PHASE_JSON')).join(safeJson(next))\n      .split(MARK('PAGE_SRC')).join(safeJson(tpl));\n    return SKELETON_OPEN + body + '\u003c/body>\u003c/html>';\n  }\n\n  const READ_ONLY = ['not_writer', 'not_granted', 'not_declared', 'consent_required', 'capability_disabled', 'capability_removed'];\n  async function initAdmin() {\n    const c = window.claude;\n    if (!c || typeof c.use !== 'function') return;\n    let viewer = null;\n    let art = null;\n    try {\n      [viewer, art] = await Promise.all([c.use('user'), c.use('artifact')]);\n    } catch (err) {\n      return;\n    }\n    if (!viewer || !art) return;\n    let allowed = false;\n    try { allowed = (await viewer.isOwner()) || (await viewer.canEdit()); } catch (err) { allowed = false; }\n    if (!allowed) return;\n\n    const sw = $('phase-switch');\n    const label = $('phase-label');\n    const status = $('admin-status');\n    const paintSwitch = (open) => {\n      sw.setAttribute('aria-checked', String(open));\n      label.textContent = open ? 'Offen' : 'Geschlossen';\n    };\n    paintSwitch(phase.open);\n    $('admin').hidden = false;\n\n    let busy = false;\n    sw.addEventListener('click', async () => {\n      if (busy) return;\n      busy = true;\n      const next = { open: !phase.open, changedAt: new Date().toISOString() };\n      paintSwitch(next.open);\n      sw.disabled = true;\n      status.classList.remove('error');\n      status.textContent = 'Wird gespeichert …';\n      save();\n      for (let attempt = 0; attempt \u003c 2; attempt += 1) {\n        try {\n          await art.publish(renderDocument(next));\n          status.textContent = next.open ? 'Bewerbungsphase ist jetzt offen. Die Seite lädt neu.' : 'Bewerbungsphase ist jetzt geschlossen. Die Seite lädt neu.';\n          return;\n        } catch (err) {\n          const code = err && err.code;\n          if (code === 'upstream_error' && attempt === 0) {\n            await new Promise((r) => setTimeout(r, 500 + Math.random() * 700));\n            continue;\n          }\n          if (code === 'conflict') {\n            status.textContent = 'Die Seite wurde gerade woanders geändert und lädt neu. Danach kannst du nochmal schalten.';\n            return;\n          }\n          paintSwitch(phase.open);\n          sw.disabled = false;\n          busy = false;\n          status.classList.add('error');\n          if (READ_ONLY.includes(code)) {\n            status.textContent = 'In dieser Ansicht kannst du die Seite nicht ändern.';\n            sw.disabled = true;\n          } else if (code === 'rate_limited') {\n            status.textContent = 'Zu viele Änderungen hintereinander. Warte kurz und versuch es dann nochmal.';\n          } else {\n            status.textContent = 'Speichern hat nicht geklappt. Versuch es gleich nochmal.';\n          }\n          return;\n        }\n      }\n    });\n  }\n  initAdmin();\n\n  /* Boot: restore a draft, and keep answers when the page updates while open */\n  let started = false;\n  function start(data) {\n    if (started) return;\n    started = true;\n    const fromHot = data && typeof data === 'object' && data.v === 2 ? data : null;\n    applyDraft(fromHot || loadDraft());\n  }\n  try {\n    const hot = window.claude && window.claude.hot;\n    if (hot && typeof hot.snapshot === 'function') hot.snapshot(() => draft());\n    if (hot && typeof hot.ready === 'function') {\n      hot.ready(start);\n      setTimeout(() => start(null), 1500);\n    } else {\n      start(hot && hot.data);\n    }\n  } catch (err) {\n    start(null);\n  }\n})();\n\u003c/script>\n"</script>
+<script>
+(() => {
+  const TYPES = {
+    member: {
+      why: {
+        label: 'Warum willst du in die LA Gang?',
+        hint: 'Erzähl kurz, wer du bist und was du bei uns machen willst. Mindestens 60 Zeichen.',
+        min: 60,
+        head: 'Warum ich in die LA Gang will'
+      },
+      exp: { label: 'Was machst du gern?', hint: 'Spiele, Hobbys, Musik: alles zählt.', head: 'Was ich gern mache' },
+      q: {
+        tag: 'Frage für Mitglieder',
+        label: 'Woher kennst du die LA Gang? Kennst du schon jemanden von uns?',
+        hint: 'Zum Beispiel über Freunde oder einen anderen Server. Mindestens 10 Zeichen.',
+        min: 10,
+        max: 300,
+        head: 'Woher ich die LA Gang kenne'
+      }
+    },
+    leader: {
+      why: {
+        label: 'Warum willst du eine Division anführen?',
+        hint: 'Was reizt dich daran und warum passt du dafür? Mindestens 80 Zeichen.',
+        min: 80,
+        head: 'Warum ich eine Division anführen will'
+      },
+      exp: { label: 'Hast du schon mal eine Gruppe geleitet?', hint: 'Andere Server, Clans, Teams, Schule oder Verein zählen auch.', head: 'Erfahrung als Anführer' },
+      q: {
+        tag: 'Frage für Divisions Anführer',
+        label: 'Zwei aus deiner Division streiten sich und die anderen haben keine Lust mehr. Was machst du?',
+        hint: 'Was machst du zuerst, was danach? Mindestens 60 Zeichen.',
+        min: 60,
+        max: 500,
+        head: 'Rollenfrage: Streit in der Division'
+      }
+    }
+  };
+  const DEFAULTS = {
+    why: { label: 'Warum willst du dabei sein?', hint: 'Erzähl kurz, wer du bist und was dich reizt. Mindestens 60 Zeichen.', min: 60 },
+    exp: { label: 'Was machst du gern?', hint: 'Spiele, Hobbys, Musik: alles zählt.' },
+    q: { tag: 'Deine Frage', label: 'Hier steht gleich deine Frage', hint: 'Wähle oben aus, wofür du dich bewirbst, dann erscheint sie.' }
+  };
+  const DIVS = ['1', '2', '3', '4'];
+  const DISCORD_LIMIT = 2000;
+  const STORE_KEY = 'la-gang-bewerbung-v2';
+  const OWNER_USER = 'service_karte';
+  const ORDER = ['role', 'div', 'user', 'age', 'freq', 'why', 'scenario', 'rules'];
+  const ID_OF = { user: 'f-user', age: 'f-age', why: 'f-why', scenario: 'f-scenario', rules: 'f-rules' };
+  const KEY_BY_ID = { 'f-user': 'user', 'f-age': 'age', 'f-why': 'why', 'f-scenario': 'scenario', 'f-rules': 'rules' };
+
+  const $ = (id) => document.getElementById(id);
+  const page = $('page');
+  const form = $('apply');
+  const reduceMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
+  const blankScenarios = () => ({ member: '', leader: '' });
+
+  const state = { type: '', div: '', scenario: blankScenarios() };
+  const touched = new Set();
+  let showAll = false;
+  let resultShown = false;
+  let lastMsgKey = '';
+  const STEP_KEYS = [['role', 'div'], ['user', 'age', 'freq'], ['why', 'scenario']];
+
+  const go = (el, block) => el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: block || 'start' });
+  const radios = (name) => Array.from(form.querySelectorAll('input[name="' + name + '"]'));
+  const checkedValue = (name) => { const el = radios(name).find((i) => i.checked); return el ? el.value : ''; };
+  const checkedValues = (name) => radios(name).filter((i) => i.checked).map((i) => i.value);
+  const normUser = (v) => String(v || '').trim().replace(/^@+/, '').toLowerCase();
+  const validUser = (u) => /^[a-z0-9_.]{2,32}$/.test(u) && !/\.\./.test(u);
+  const fmt = (n) => n.toLocaleString('de-DE');
+  const joinDe = (list) => list.length < 2 ? list.join('') : list.slice(0, -1).join(', ') + ' und ' + list[list.length - 1];
+  const whyMin = () => (TYPES[state.type] ? TYPES[state.type].why.min : DEFAULTS.why.min);
+
+  /* The exact role names from the server */
+  function roleLabel(type, div) {
+    if (type === 'member') return DIVS.includes(div) ? div + '. Division' : 'Mitglied, Division egal';
+    return DIVS.includes(div) ? div + '. Divisions Anführer' : 'Divisions Anführer, Division egal';
+  }
+
+  function collect() {
+    return {
+      type: state.type,
+      div: state.div,
+      user: normUser($('f-user').value),
+      age: $('f-age').value.trim(),
+      freq: checkedValue('freq'),
+      times: checkedValues('times'),
+      why: $('f-why').value.trim(),
+      exp: $('f-exp').value.trim(),
+      scenario: state.type ? $('f-scenario').value.trim() : '',
+      rules: $('f-rules').checked
+    };
+  }
+
+  function validate(d) {
+    const e = {};
+    const t = TYPES[d.type];
+    const min = t ? t.why.min : DEFAULTS.why.min;
+    if (!t) e.role = 'Wähle aus, ob du Mitglied oder Divisions Anführer werden willst.';
+    if (!d.div) e.div = 'Wähle eine Division aus oder tippe auf „Egal, teilt mich ein“.';
+    if (!d.user) e.user = 'Gib deinen Discord-Benutzernamen ein.';
+    else if (!validUser(d.user)) e.user = 'Benutzernamen haben 2 bis 32 Zeichen: Kleinbuchstaben, Zahlen, Punkt und Unterstrich.';
+    if (!d.age) e.age = 'Gib dein Alter ein.';
+    else if (!/^\d{1,2}$/.test(d.age)) e.age = 'Gib dein Alter als Zahl ein, zum Beispiel 16.';
+    if (!d.freq) e.freq = 'Wähle aus, wie oft du online bist.';
+    if (!d.why) e.why = 'Erzähl uns, warum du dabei sein willst.';
+    else if (d.why.length < min) e.why = 'Noch ' + (min - d.why.length) + ' Zeichen bis zum Minimum von ' + min + '.';
+    if (!t) e.scenario = 'Wähle zuerst oben aus, wofür du dich bewirbst.';
+    else if (!d.scenario) e.scenario = 'Beantworte die Frage.';
+    else if (d.scenario.length < t.q.min) e.scenario = 'Noch ' + (t.q.min - d.scenario.length) + ' Zeichen bis zum Minimum von ' + t.q.min + '.';
+    if (!d.rules) e.rules = 'Bestätige, dass du dich an die Regeln hältst.';
+    return e;
+  }
+
+  function inputsFor(k) {
+    if (k === 'role' || k === 'div' || k === 'freq') return radios(k);
+    return [$(ID_OF[k])];
+  }
+
+  function paint(errors) {
+    ORDER.forEach((k) => {
+      const msg = (showAll || touched.has(k)) ? (errors[k] || '') : '';
+      $('e-' + k).textContent = msg;
+      inputsFor(k).forEach((i) => {
+        if (msg) i.setAttribute('aria-invalid', 'true');
+        else i.removeAttribute('aria-invalid');
+      });
+    });
+  }
+
+  function count(id, el, min) {
+    const c = $(id);
+    const trimmed = el.value.trim().length;
+    if (min && trimmed < min) {
+      c.textContent = trimmed + ' von mind. ' + min;
+      c.classList.remove('ok');
+    } else {
+      c.textContent = el.value.length + ' / ' + el.maxLength;
+      c.classList.toggle('ok', !!min);
+    }
+  }
+
+  function updateCounts() {
+    const t = TYPES[state.type];
+    count('c-why', $('f-why'), whyMin());
+    count('c-exp', $('f-exp'), 0);
+    const sc = $('f-scenario');
+    $('c-scenario').hidden = sc.disabled;
+    if (t) count('c-scenario', sc, t.q.min);
+  }
+
+  function updatePills() {
+    document.querySelectorAll('.pill').forEach((p) => {
+      const on = p.dataset.pick === 'leader'
+        ? state.type === 'leader'
+        : state.type === 'member' && state.div === p.dataset.d;
+      p.setAttribute('aria-pressed', String(on));
+    });
+  }
+
+  function setType(key) {
+    const ta = $('f-scenario');
+    if (state.type) state.scenario[state.type] = ta.value;
+    const t = TYPES[key];
+    state.type = t ? key : '';
+    if (t) page.dataset.type = key;
+    else delete page.dataset.type;
+    radios('role').forEach((i) => { i.checked = i.value === state.type; });
+    const why = t ? t.why : DEFAULTS.why;
+    const exp = t ? t.exp : DEFAULTS.exp;
+    const q = t ? t.q : DEFAULTS.q;
+    $('l-why').textContent = why.label;
+    $('h-why').textContent = why.hint;
+    $('l-exp').textContent = exp.label;
+    $('h-exp').textContent = exp.hint;
+    $('t-scenario').textContent = q.tag;
+    $('l-scenario').textContent = q.label;
+    $('h-scenario').textContent = q.hint;
+    ta.disabled = !t;
+    ta.maxLength = t ? t.q.max : 500;
+    ta.value = t ? (state.scenario[key] || '') : '';
+    updatePills();
+  }
+
+  function setDiv(value) {
+    state.div = DIVS.includes(value) || value === 'any' ? value : '';
+    radios('div').forEach((i) => { i.checked = i.value === state.div; });
+    updatePills();
+  }
+
+  /* Discord message: markdown the DM renders, @everyone/@here defused, 2000-character messages */
+  const defuse = (s) => s.replace(/@(everyone|here)/gi, '@​$1');
+  const quote = (t) => t.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).map((l) => '> ' + defuse(l)).join('\n');
+
+  function buildSections(d) {
+    const t = TYPES[d.type];
+    const online = d.freq + (d.times.length ? ', meist ' + joinDe(d.times) : '');
+    const head = [
+      '## Bewerbung für die LA Gang',
+      '**Rolle:** ' + roleLabel(d.type, d.div),
+      '**Discord:** @' + d.user,
+      '**Alter:** ' + d.age,
+      '**Online:** ' + online
+    ];
+    const sections = [head.join('\n')];
+    sections.push('**' + t.why.head + '**\n' + quote(d.why));
+    if (d.exp) sections.push('**' + t.exp.head + '**\n' + quote(d.exp));
+    sections.push('**' + t.q.head + '**\n' + quote(d.scenario));
+    sections.push('-# Regeln der LA Gang akzeptiert');
+    return sections;
+  }
+
+  function pack(sections) {
+    const out = [];
+    let cur = '';
+    sections.forEach((s) => {
+      const next = cur ? cur + '\n\n' + s : s;
+      if (next.length <= DISCORD_LIMIT) cur = next;
+      else { if (cur) out.push(cur); cur = s; }
+    });
+    if (cur) out.push(cur);
+    return out;
+  }
+
+  async function copy(text, sourceEl, btn, label, statusId, okMsg) {
+    let ok = false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      }
+    } catch (err) { ok = false; }
+    if (!ok) {
+      try {
+        const sel = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(sourceEl);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        ok = !!(document.execCommand && document.execCommand('copy'));
+      } catch (err) { ok = false; }
+    }
+    const status = $(statusId);
+    status.textContent = ok ? okMsg : 'Der Text ist markiert. Kopier ihn über das Menü deines Geräts.';
+    status.classList.toggle('ok', ok);
+    if (ok) {
+      btn.textContent = 'Kopiert';
+      btn.classList.add('copied');
+      if (statusId === 'copy-status') $('step-copy').classList.add('done');
+      clearTimeout(btn._reset);
+      btn._reset = setTimeout(() => { btn.textContent = label; btn.classList.remove('copied'); }, 2500);
+    }
+  }
+
+  function renderResult(d) {
+    $('m-avatar').textContent = d.user.charAt(0).toUpperCase();
+    $('m-name').textContent = '@' + d.user;
+    $('m-role').textContent = roleLabel(d.type, d.div) + ' · So würde dein Name in der LA Gang aussehen';
+    $('next-member').hidden = d.type !== 'member';
+    $('next-leader').hidden = d.type !== 'leader';
+    const msgs = pack(buildSections(d));
+    const key = msgs.join('\u0000');
+    if (key === lastMsgKey) return;
+    lastMsgKey = key;
+    $('step-copy').classList.remove('done');
+    $('copy-status').textContent = '';
+    const box = $('msgs');
+    box.replaceChildren();
+    msgs.forEach((m, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'msg';
+      if (msgs.length > 1) {
+        const part = document.createElement('p');
+        part.className = 'msg-part';
+        part.textContent = 'Nachricht ' + (i + 1) + ' von ' + msgs.length;
+        wrap.append(part);
+      }
+      const pre = document.createElement('pre');
+      pre.className = 'msg-text';
+      pre.id = 'out-' + (i + 1);
+      pre.tabIndex = 0;
+      pre.textContent = m;
+      const foot = document.createElement('div');
+      foot.className = 'msg-foot';
+      const cnt = document.createElement('span');
+      cnt.className = 'count';
+      cnt.textContent = fmt(m.length) + ' / ' + fmt(DISCORD_LIMIT) + ' Zeichen';
+      const label = msgs.length > 1 ? 'Teil ' + (i + 1) + ' kopieren' : 'Bewerbung kopieren';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-primary';
+      btn.id = 'copy-' + (i + 1);
+      btn.textContent = label;
+      btn.addEventListener('click', () => {
+        copy(m, pre, btn, label, 'copy-status', 'Kopiert. Jetzt in die DM an xDanielx einfügen.');
+      });
+      foot.append(cnt, btn);
+      wrap.append(pre, foot);
+      box.append(wrap);
+    });
+    $('split-note').hidden = msgs.length < 2;
+  }
+
+  function showResult(scroll) {
+    resultShown = true;
+    $('result').hidden = false;
+    $('stale').hidden = true;
+    if (scroll) {
+      go($('result'));
+      $('result').focus({ preventScroll: true });
+    }
+  }
+
+  function updateHero(d) {
+    $('hero-mention').textContent = '@' + (validUser(d.user) ? d.user : 'dein_name');
+  }
+
+  function refresh() {
+    const d = collect();
+    const errors = validate(d);
+    paint(errors);
+    updateCounts();
+    updateHero(d);
+    STEP_KEYS.forEach((keys, i) => $('s-' + (i + 1)).classList.toggle('done', keys.every((k) => !errors[k])));
+    if (resultShown) {
+      if (Object.keys(errors).length === 0) { renderResult(d); $('stale').hidden = true; }
+      else $('stale').hidden = false;
+    }
+  }
+
+  /* Draft kept on this device only */
+  function draft() {
+    const sc = Object.assign({}, state.scenario);
+    if (state.type) sc[state.type] = $('f-scenario').value;
+    return {
+      v: 2,
+      type: state.type,
+      div: state.div,
+      user: $('f-user').value,
+      age: $('f-age').value,
+      freq: checkedValue('freq'),
+      times: checkedValues('times'),
+      why: $('f-why').value,
+      exp: $('f-exp').value,
+      scenario: sc,
+      rules: $('f-rules').checked,
+      result: resultShown
+    };
+  }
+  let saveTimer;
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(draft())); } catch (err) { /* storage unavailable */ }
+  }
+  function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); }
+  function loadDraft() {
+    try { const raw = localStorage.getItem(STORE_KEY); return raw ? JSON.parse(raw) : null; } catch (err) { return null; }
+  }
+  function storageWorks() {
+    try { localStorage.setItem('__probe', '1'); localStorage.removeItem('__probe'); return true; } catch (err) { return false; }
+  }
+
+  function applyDraft(dr) {
+    if (!dr || typeof dr !== 'object') { refresh(); return; }
+    const str = (v) => (typeof v === 'string' ? v : '');
+    $('f-user').value = str(dr.user);
+    $('f-age').value = str(dr.age);
+    $('f-why').value = str(dr.why);
+    $('f-exp').value = str(dr.exp);
+    radios('freq').forEach((i) => { i.checked = i.value === dr.freq; });
+    const times = Array.isArray(dr.times) ? dr.times : [];
+    radios('times').forEach((i) => { i.checked = times.includes(i.value); });
+    $('f-rules').checked = !!dr.rules;
+    const sc = blankScenarios();
+    if (dr.scenario && typeof dr.scenario === 'object') Object.keys(sc).forEach((k) => { sc[k] = str(dr.scenario[k]); });
+    state.type = '';
+    state.scenario = sc;
+    setType(TYPES[dr.type] ? dr.type : '');
+    setDiv(str(dr.div));
+    const d = collect();
+    if (dr.result && Object.keys(validate(d)).length === 0) { renderResult(d); showResult(false); }
+    refresh();
+  }
+
+  function clearAll() {
+    form.reset();
+    state.type = '';
+    state.scenario = blankScenarios();
+    setType('');
+    setDiv('');
+    touched.clear();
+    showAll = false;
+    resultShown = false;
+    $('result').hidden = true;
+    $('msgs').replaceChildren();
+    lastMsgKey = '';
+    $('step-copy').classList.remove('done');
+    $('copy-status').textContent = '';
+    $('owner-status').textContent = '';
+    try { localStorage.removeItem(STORE_KEY); } catch (err) { /* storage unavailable */ }
+    refresh();
+    go(document.querySelector('.hero'));
+  }
+
+  function focusField(k) {
+    let el;
+    if (k === 'role' || (k === 'scenario' && !state.type)) el = radios('role').find((i) => i.checked) || $('role-member');
+    else if (k === 'div' || k === 'freq') el = radios(k)[0];
+    else el = inputsFor(k)[0];
+    el.focus({ preventScroll: true });
+    go(el.closest('.field, .roles, .confirm') || el, 'center');
+  }
+
+  /* Events */
+  form.addEventListener('change', (ev) => {
+    const t = ev.target;
+    if (t.name === 'role' && t.checked) setType(t.value);
+    if (t.name === 'div' && t.checked) setDiv(t.value);
+    if (t.name) touched.add(t.name);
+    refresh();
+    scheduleSave();
+  });
+  form.addEventListener('input', () => { refresh(); scheduleSave(); });
+  form.addEventListener('focusout', (ev) => {
+    const k = KEY_BY_ID[ev.target.id];
+    if (!k) return;
+    if (ev.target.id === 'f-user') {
+      const n = normUser(ev.target.value);
+      if (n !== ev.target.value) { ev.target.value = n; scheduleSave(); }
+    }
+    if (ev.target.value || k === 'rules') touched.add(k);
+    refresh();
+  });
+  form.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    $('f-user').value = normUser($('f-user').value);
+    showAll = true;
+    const d = collect();
+    const errors = validate(d);
+    paint(errors);
+    updateHero(d);
+    const first = ORDER.find((k) => errors[k]);
+    if (first) { focusField(first); return; }
+    renderResult(d);
+    showResult(true);
+    save();
+  });
+
+  document.querySelectorAll('.pill').forEach((p) => {
+    p.addEventListener('click', () => {
+      if (p.dataset.pick === 'leader') {
+        setType('leader');
+      } else {
+        setType('member');
+        setDiv(p.dataset.d);
+        touched.add('div');
+      }
+      touched.add('role');
+      refresh();
+      scheduleSave();
+      go($('step-role'));
+      $('role-' + state.type).focus({ preventScroll: true });
+    });
+  });
+
+  const ownerBtn = $('copy-owner');
+  ownerBtn.addEventListener('click', () => {
+    copy(OWNER_USER, $('owner-user'), ownerBtn, 'Namen kopieren', 'owner-status', 'Benutzername kopiert. In Discord unter Freund hinzufügen einfügen.');
+  });
+
+  $('edit').addEventListener('click', () => go($('step-about')));
+
+  let armed = false;
+  let armTimer;
+  const resetBtn = $('reset');
+  function disarm() { armed = false; resetBtn.textContent = 'Formular leeren'; resetBtn.classList.remove('armed'); }
+  resetBtn.addEventListener('click', () => {
+    if (!armed) {
+      armed = true;
+      resetBtn.textContent = 'Wirklich alles löschen?';
+      resetBtn.classList.add('armed');
+      clearTimeout(armTimer);
+      armTimer = setTimeout(disarm, 4000);
+      return;
+    }
+    clearTimeout(armTimer);
+    disarm();
+    clearAll();
+  });
+
+  if (!storageWorks()) $('draft-note').hidden = true;
+
+  /* Bewerbungsphase: the state lives in #phase-data inside this page. The owner's switch renders the
+     whole page again from the template in #page-src with the new state and publishes it as a new version. */
+  const SKELETON_OPEN = '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>';
+  const MARK = (k) => '%' + '%' + k + '%' + '%';
+  const safeJson = (v) => JSON.stringify(v).replace(/</g, '\\u003c');
+
+  function readPhase() {
+    try {
+      const p = JSON.parse($('phase-data').textContent);
+      return { open: p.open !== false, changedAt: typeof p.changedAt === 'string' ? p.changedAt : null };
+    } catch (err) {
+      return { open: true, changedAt: null };
+    }
+  }
+  const phase = readPhase();
+  if (!phase.open && phase.changedAt) {
+    const since = new Date(phase.changedAt);
+    if (!isNaN(since.getTime())) {
+      $('closed-since').textContent = 'Geschlossen seit ' + since.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+  }
+
+  function renderDocument(next) {
+    const tpl = JSON.parse($('page-src').textContent);
+    const body = tpl
+      .split(MARK('PHASE')).join(next.open ? 'open' : 'closed')
+      .split(MARK('PHASE_JSON')).join(safeJson(next))
+      .split(MARK('PAGE_SRC')).join(safeJson(tpl));
+    return SKELETON_OPEN + body + '</body></html>';
+  }
+
+  const READ_ONLY = ['not_writer', 'not_granted', 'not_declared', 'consent_required', 'capability_disabled', 'capability_removed'];
+  async function initAdmin() {
+    const c = window.claude;
+    if (!c || typeof c.use !== 'function') return;
+    let viewer = null;
+    let art = null;
+    try {
+      [viewer, art] = await Promise.all([c.use('user'), c.use('artifact')]);
+    } catch (err) {
+      return;
+    }
+    if (!viewer || !art) return;
+    let allowed = false;
+    try { allowed = (await viewer.isOwner()) || (await viewer.canEdit()); } catch (err) { allowed = false; }
+    if (!allowed) return;
+
+    const sw = $('phase-switch');
+    const label = $('phase-label');
+    const status = $('admin-status');
+    const paintSwitch = (open) => {
+      sw.setAttribute('aria-checked', String(open));
+      label.textContent = open ? 'Offen' : 'Geschlossen';
+    };
+    paintSwitch(phase.open);
+    $('admin').hidden = false;
+
+    let busy = false;
+    sw.addEventListener('click', async () => {
+      if (busy) return;
+      busy = true;
+      const next = { open: !phase.open, changedAt: new Date().toISOString() };
+      paintSwitch(next.open);
+      sw.disabled = true;
+      status.classList.remove('error');
+      status.textContent = 'Wird gespeichert …';
+      save();
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        try {
+          await art.publish(renderDocument(next));
+          status.textContent = next.open ? 'Bewerbungsphase ist jetzt offen. Die Seite lädt neu.' : 'Bewerbungsphase ist jetzt geschlossen. Die Seite lädt neu.';
+          return;
+        } catch (err) {
+          const code = err && err.code;
+          if (code === 'upstream_error' && attempt === 0) {
+            await new Promise((r) => setTimeout(r, 500 + Math.random() * 700));
+            continue;
+          }
+          if (code === 'conflict') {
+            status.textContent = 'Die Seite wurde gerade woanders geändert und lädt neu. Danach kannst du nochmal schalten.';
+            return;
+          }
+          paintSwitch(phase.open);
+          sw.disabled = false;
+          busy = false;
+          status.classList.add('error');
+          if (READ_ONLY.includes(code)) {
+            status.textContent = 'In dieser Ansicht kannst du die Seite nicht ändern.';
+            sw.disabled = true;
+          } else if (code === 'rate_limited') {
+            status.textContent = 'Zu viele Änderungen hintereinander. Warte kurz und versuch es dann nochmal.';
+          } else {
+            status.textContent = 'Speichern hat nicht geklappt. Versuch es gleich nochmal.';
+          }
+          return;
+        }
+      }
+    });
+  }
+  initAdmin();
+
+  /* Boot: restore a draft, and keep answers when the page updates while open */
+  let started = false;
+  function start(data) {
+    if (started) return;
+    started = true;
+    const fromHot = data && typeof data === 'object' && data.v === 2 ? data : null;
+    applyDraft(fromHot || loadDraft());
+  }
+  try {
+    const hot = window.claude && window.claude.hot;
+    if (hot && typeof hot.snapshot === 'function') hot.snapshot(() => draft());
+    if (hot && typeof hot.ready === 'function') {
+      hot.ready(start);
+      setTimeout(() => start(null), 1500);
+    } else {
+      start(hot && hot.data);
+    }
+  } catch (err) {
+    start(null);
+  }
+})();
+</script>
+</body></html>
